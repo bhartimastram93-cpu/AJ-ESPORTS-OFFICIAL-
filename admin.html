@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>AJ ESPORTS ADMIN</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+</head>
+
+
+<body>
+
+<header>
+
+<div class="logo">
+AJ ESPORTS <span>ADMIN</span>
+</div>
+
+<button onclick="logout()">
+Logout
+</button>
+
+</header>
+
+
+<section class="section">
+
+<h2>🛠 ADMIN PANEL</h2>
+
+<div id="adminMessage"></div>
+
+<div id="transactions">
+
+Loading...
+
+</div>
+
+</section>
+
+
+<script>
+
+const supabase =
+window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+);
+
+
+/* =========================
+   CHECK ADMIN
+========================= */
+
+async function checkAdmin() {
+
+    const { data } =
+        await supabase.auth.getSession();
+
+
+    if (!data.session) {
+
+        showLogin();
+
+        return;
+    }
+
+
+    const email =
+        data.session.user.email;
+
+
+    if (
+        String(email).toLowerCase() !==
+        String(window.ADMIN_EMAIL).toLowerCase()
+    ) {
+
+        document.body.innerHTML =
+            `
+            <div class="section">
+                <h2>Access Denied ❌</h2>
+                <p>This account is not an admin account.</p>
+            </div>
+            `;
+
+        return;
+    }
+
+
+    loadTransactions();
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+function showLogin() {
+
+    document.getElementById("transactions").innerHTML = `
+
+        <div class="loginBox">
+
+            <h2>Admin Login</h2>
+
+            <input
+                id="email"
+                type="email"
+                placeholder="Admin Email"
+            >
+
+            <input
+                id="password"
+                type="password"
+                placeholder="Password"
+            >
+
+            <button
+                class="mainBtn"
+                onclick="login()"
+            >
+                LOGIN
+            </button>
+
+            <p id="loginMessage"></p>
+
+        </div>
+
+    `;
+
+}
+
+
+async function login() {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+
+    const { data, error } =
+        await supabase.auth.signInWithPassword({
+
+            email,
+            password
+
+        });
+
+
+    if (error) {
+
+        document.getElementById("loginMessage")
+        .innerText = error.message;
+
+        return;
+    }
+
+
+    if (
+        email.toLowerCase() !==
+        window.ADMIN_EMAIL.toLowerCase()
+    ) {
+
+        await supabase.auth.signOut();
+
+        document.getElementById("loginMessage")
+        .innerText = "Not an admin account.";
+
+        return;
+    }
+
+
+    loadTransactions();
+
+}
+
+
+/* =========================
+   LOAD TRANSACTIONS
+========================= */
+
+async function loadTransactions() {
+
+    const box =
+        document.getElementById("transactions");
+
+
+    const { data, error } =
+        await supabase
+        .from("Transactions")
+        .select(
+            'id,Phone,Amount,Type,Status,"Payment id",Payment,User_id,Match_id'
+        )
+        .order("id", { ascending:false });
+
+
+    if (error) {
+
+        box.innerHTML =
+            `<div class="error">${error.message}</div>`;
+
+        return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+        box.innerHTML =
+            `<div class="loading">No transactions.</div>`;
+
+        return;
+    }
+
+
+    box.innerHTML = "";
+
+
+    for (const t of data) {
+
+        const { data: match } =
+            await supabase
+            .from("Matches")
+            .select(
+                'Title,"Room id","Room pass"'
+            )
+            .eq("id", t.Match_id)
+            .single();
+
+
+        const card =
+            document.createElement("div");
+
+        card.className = "adminCard";
+
+
+        card.innerHTML = `
+
+            <h3>
+                ${escapeHTML(
+                    match?.Title || "Unknown Tournament"
+                )}
+            </h3>
+
+            <p>
+                Phone:
+                <b>${escapeHTML(t.Phone)}</b>
+            </p>
+
+            <p>
+                Amount:
+                <b>₹${t.Amount}</b>
+            </p>
+
+            <p>
+                Payment ID:
+                <b>${escapeHTML(t["Payment id"])}</b>
+            </p>
+
+            <p>
+                Status:
+                <b>${escapeHTML(t.Status)}</b>
+            </p>
+
+            <div class="adminInputs">
+
+                <input
+                    id="room_${t.id}"
+                    placeholder="Room ID"
+                    value="${escapeHTML(match?.["Room id"] || "")}"
+                >
+
+                <input
+                    id="pass_${t.id}"
+                    placeholder="Room Password"
+                    value="${escapeHTML(match?.["Room pass"] || "")}"
+                >
+
+            </div>
+
+            <button
+                class="approve"
+                onclick="approve(${t.id}, ${t.Match_id})"
+            >
+                ✅ APPROVE
+            </button>
+
+            <button
+                class="reject"
+                onclick="reject(${t.id})"
+            >
+                ❌ REJECT
+            </button>
+
+        `;
+
+
+        box.appendChild(card);
+
+    }
+
+}
+
+
+/* =========================
+   APPROVE
+========================= */
+
+async function approve(transactionId, matchId) {
+
+    const room =
+        document.getElementById(
+            `room_${transactionId}`
+        ).value.trim();
+
+    const pass =
+        document.getElementById(
+            `pass_${transactionId}`
+        ).value.trim();
+
+
+    if (!room || !pass) {
+
+        alert("Room ID and Room Password required.");
+
+        return;
+    }
+
+
+    /* Update Match */
+
+    const { error: matchError } =
+        await supabase
+        .from("Matches")
+        .update({
+
+            "Room id": room,
+
+            "Room pass": pass
+
+        })
+        .eq("id", matchId);
+
+
+    if (matchError) {
+
+        alert(matchError.message);
+
+        return;
+    }
+
+
+    /* Approve transaction */
+
+    const { error } =
+        await supabase
+        .from("Transactions")
+        .update({
+
+            Status: "Approved"
+
+        })
+        .eq("id", transactionId);
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+    }
+
+
+    alert("Approved successfully!");
+
+    loadTransactions();
+
+}
+
+
+/* =========================
+   REJECT
+========================= */
+
+async function reject(id) {
+
+    const ok =
+        confirm("Reject this payment?");
+
+
+    if (!ok) return;
+
+
+    const { error } =
+        await supabase
+        .from("Transactions")
+        .update({
+
+            Status: "Rejected"
+
+        })
+        .eq("id", id);
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+    }
+
+
+    loadTransactions();
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout() {
+
+    await supabase.auth.signOut();
+
+    location.reload();
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>
