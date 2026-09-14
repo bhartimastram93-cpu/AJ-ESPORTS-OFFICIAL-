@@ -25,7 +25,6 @@
     </div>
 </header>
 
-
 <section class="hero">
     <div>
         <p class="small">WELCOME TO</p>
@@ -38,7 +37,6 @@
     </div>
 </section>
 
-
 <section id="matches" class="section">
 
 <h2>🔥 LIVE TOURNAMENTS</h2>
@@ -48,7 +46,6 @@
 </div>
 
 </section>
-
 
 <section id="entries" class="section" style="display:none">
 
@@ -60,8 +57,7 @@
 
 </section>
 
-
-<!-- AUTH MODAL -->
+<!-- AUTH -->
 
 <div id="authModal" class="modal">
 
@@ -89,7 +85,7 @@
 LOGIN
 </button>
 
-<p id="authSwitch" onclick="toggleAuth()">
+<p id="authSwitch" onclick="toggleAuth">
 Create new account
 </p>
 
@@ -98,8 +94,7 @@ Create new account
 </div>
 </div>
 
-
-<!-- JOIN MODAL -->
+<!-- JOIN -->
 
 <div id="joinModal" class="modal">
 
@@ -142,39 +137,102 @@ SUBMIT PAYMENT
 </div>
 </div>
 
-
 <footer>
 AJ ESPORTS OFFICIAL © 2026
 </footer>
 
-
 <script>
 
-const supabase = window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
-);
-
+let supabaseClient = null;
 let currentUser = null;
 let selectedMatch = null;
 let signupMode = false;
 
 
 /* =========================
-   INITIALIZE
+   SUPABASE START
 ========================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
+function startSupabase() {
 
-    const { data } = await supabase.auth.getSession();
+    if (!window.supabase) {
+        showError("Supabase library load nahi hui.");
+        return false;
+    }
 
-    currentUser = data.session?.user || null;
+    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+        showError("Supabase configuration missing.");
+        return false;
+    }
 
-    updateLoginUI();
+    try {
 
-    loadMatches();
+        supabaseClient = window.supabase.createClient(
+            window.SUPABASE_URL,
+            window.SUPABASE_ANON_KEY
+        );
+
+        return true;
+
+    } catch (error) {
+
+        showError("Supabase connection error: " + error.message);
+        return false;
+    }
+}
+
+
+/* =========================
+   START
+========================= */
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+    if (!startSupabase()) return;
+
+    try {
+
+        const result =
+            await supabaseClient.auth.getSession();
+
+        currentUser =
+            result.data.session ?
+            result.data.session.user :
+            null;
+
+        updateLoginUI();
+
+        await loadMatches();
+
+    } catch (error) {
+
+        showError(error.message);
+
+    }
 
 });
+
+
+/* =========================
+   ERROR
+========================= */
+
+function showError(message) {
+
+    const container =
+        document.getElementById("matchesList");
+
+    if (container) {
+
+        container.innerHTML =
+            '<div class="error">Error: ' +
+            escapeHTML(message) +
+            '</div>';
+
+    }
+
+    console.error(message);
+}
 
 
 /* =========================
@@ -182,12 +240,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 ========================= */
 
 function openAuth() {
+
     document.getElementById("authModal").style.display = "flex";
+
 }
 
 function closeAuth() {
+
     document.getElementById("authModal").style.display = "none";
+
 }
+
 
 function toggleAuth() {
 
@@ -203,14 +266,18 @@ function toggleAuth() {
         signupMode ? "block" : "none";
 
     document.getElementById("authSwitch").innerText =
-        signupMode ? "Already have an account? Login" :
-                     "Create new account";
+        signupMode
+        ? "Already have an account? Login"
+        : "Create new account";
 
     document.getElementById("authMessage").innerText = "";
+
 }
 
 
 async function authAction() {
+
+    if (!supabaseClient) return;
 
     const email =
         document.getElementById("authEmail").value.trim();
@@ -218,10 +285,14 @@ async function authAction() {
     const password =
         document.getElementById("authPassword").value;
 
-    const msg = document.getElementById("authMessage");
+    const msg =
+        document.getElementById("authMessage");
 
     if (!email || !password) {
-        msg.innerText = "Email and password required.";
+
+        msg.innerText =
+            "Email and password required.";
+
         return;
     }
 
@@ -229,12 +300,13 @@ async function authAction() {
     if (!signupMode) {
 
         const { data, error } =
-            await supabase.auth.signInWithPassword({
-                email,
-                password
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
             });
 
         if (error) {
+
             msg.innerText = error.message;
             return;
         }
@@ -271,29 +343,30 @@ async function authAction() {
 
 
     const { data, error } =
-        await supabase.auth.signUp({
-            email,
-            password
+        await supabaseClient.auth.signUp({
+            email: email,
+            password: password
         });
 
 
     if (error) {
+
         msg.innerText = error.message;
         return;
     }
 
 
     if (!data.user) {
+
         msg.innerText =
             "Account created. Check your email.";
+
         return;
     }
 
 
-    /* Create User_Data row */
-
     const { error: profileError } =
-        await supabase
+        await supabaseClient
         .from("User_Data")
         .insert({
             Username: username,
@@ -315,9 +388,7 @@ async function authAction() {
 
 
     msg.innerText =
-        "Account created successfully. Please login.";
-
-    signupMode = false;
+        "Account created successfully.";
 
 }
 
@@ -328,14 +399,17 @@ async function authAction() {
 
 async function logout() {
 
-    await supabase.auth.signOut();
+    if (!supabaseClient) return;
+
+    await supabaseClient.auth.signOut();
 
     currentUser = null;
 
     updateLoginUI();
 
     document.getElementById("entriesList").innerHTML =
-        `<div class="loading">Login to see your entries.</div>`;
+        '<div class="loading">Login to see your entries.</div>';
+
 }
 
 
@@ -346,6 +420,7 @@ function updateLoginUI() {
 
     document.getElementById("logoutBtn").style.display =
         currentUser ? "block" : "none";
+
 }
 
 
@@ -358,42 +433,44 @@ async function loadMatches() {
     const container =
         document.getElementById("matchesList");
 
+    container.innerHTML =
+        '<div class="loading">Loading tournaments...</div>';
+
 
     const { data, error } =
-        await supabase
+        await supabaseClient
         .from("Matches")
         .select(
             'id,Title,"Entry fee","Per kill","Prize pool",Status,"Room id","Room pass"'
         )
-        .order("id", { ascending:false });
+        .order("id", { ascending: false });
 
 
     if (error) {
 
-        container.innerHTML =
-            `<div class="error">${error.message}</div>`;
-
+        showError(error.message);
         return;
+
     }
 
 
     if (!data || data.length === 0) {
 
         container.innerHTML =
-            `<div class="loading">No tournaments available.</div>`;
+            '<div class="loading">No tournaments available.</div>';
 
         return;
+
     }
 
 
     container.innerHTML = "";
 
 
-    data.forEach(match => {
+    data.forEach(function (match) {
 
         const status =
             String(match.Status || "").toLowerCase();
-
 
         const isLive =
             status === "live" ||
@@ -401,59 +478,88 @@ async function loadMatches() {
             status === "active";
 
 
-        const card = document.createElement("div");
+        const card =
+            document.createElement("div");
 
         card.className = "card";
 
 
-        card.innerHTML = `
+        const top =
+            document.createElement("div");
 
-            <div class="cardTop">
+        top.className = "cardTop";
 
-                <span class="gameBadge">
-                    FREE FIRE MAX
-                </span>
-
-                <span class="${isLive ? "live" : "closed"}">
-                    ${match.Status || "OPEN"}
-                </span>
-
-            </div>
-
-
-            <h3>${escapeHTML(match.Title || "Tournament")}</h3>
+        top.innerHTML =
+            '<span class="gameBadge">FREE FIRE MAX</span>' +
+            '<span class="' +
+            (isLive ? "live" : "closed") +
+            '">' +
+            escapeHTML(match.Status || "OPEN") +
+            '</span>';
 
 
-            <div class="stats">
+        const title =
+            document.createElement("h3");
 
-                <div>
-                    <small>ENTRY</small>
-                    <strong>₹${match["Entry fee"] ?? 0}</strong>
-                </div>
-
-                <div>
-                    <small>PER KILL</small>
-                    <strong>₹${match["Per kill"] ?? 0}</strong>
-                </div>
-
-                <div>
-                    <small>PRIZE</small>
-                    <strong>₹${match["Prize pool"] ?? 0}</strong>
-                </div>
-
-            </div>
+        title.innerText =
+            match.Title || "Tournament";
 
 
-            <button
-                class="mainBtn"
-                onclick='openJoin(${JSON.stringify(match)})'
-                ${!isLive ? "disabled" : ""}
-            >
-                ${isLive ? "JOIN NOW" : "CLOSED"}
-            </button>
+        const stats =
+            document.createElement("div");
 
-        `;
+        stats.className = "stats";
 
+        stats.innerHTML =
+
+            '<div>' +
+            '<small>ENTRY</small>' +
+            '<strong>₹' +
+            (match["Entry fee"] ?? 0) +
+            '</strong>' +
+            '</div>' +
+
+            '<div>' +
+            '<small>PER KILL</small>' +
+            '<strong>₹' +
+            (match["Per kill"] ?? 0) +
+            '</strong>' +
+            '</div>' +
+
+            '<div>' +
+            '<small>PRIZE</small>' +
+            '<strong>₹' +
+            (match["Prize pool"] ?? 0) +
+            '</strong>' +
+            '</div>';
+
+
+        const button =
+            document.createElement("button");
+
+        button.className = "mainBtn";
+
+        button.innerText =
+            isLive ? "JOIN NOW" : "CLOSED";
+
+        button.disabled = !isLive;
+
+        if (isLive) {
+
+            button.addEventListener(
+                "click",
+                function () {
+                    openJoin(match);
+                }
+            );
+
+        }
+
+
+        card.appendChild(top);
+        card.appendChild(title);
+        card.appendChild(stats);
+        card.appendChild(button);
 
         container.appendChild(card);
 
@@ -471,8 +577,8 @@ function openJoin(match) {
     if (!currentUser) {
 
         openAuth();
-
         return;
+
     }
 
 
@@ -482,14 +588,11 @@ function openJoin(match) {
     document.getElementById("joinTitle").innerText =
         match.Title || "Tournament";
 
-
     document.getElementById("joinFee").innerText =
         match["Entry fee"] ?? 0;
 
-
     document.getElementById("upiText").innerText =
-        window.UPI_ID;
-
+        window.UPI_ID || "ajesportsofficial@ibl";
 
     document.getElementById("joinPhone").value = "";
 
@@ -497,8 +600,8 @@ function openJoin(match) {
 
     document.getElementById("joinMessage").innerText = "";
 
-
     document.getElementById("joinModal").style.display = "flex";
+
 }
 
 
@@ -506,38 +609,41 @@ function closeJoin() {
 
     document.getElementById("joinModal").style.display =
         "none";
+
 }
 
 
 /* =========================
-   UPI PAYMENT
+   UPI
 ========================= */
 
 function payUPI() {
 
     if (!selectedMatch) return;
 
-
     const amount =
         Number(selectedMatch["Entry fee"] || 0);
-
 
     if (amount <= 0) {
 
         alert("Entry fee is not set.");
-
         return;
+
     }
 
 
     const url =
-        `upi://pay?pa=${encodeURIComponent(window.UPI_ID)}` +
-        `&pn=${encodeURIComponent("AJ ESPORTS OFFICIAL")}` +
-        `&am=${amount.toFixed(2)}` +
-        `&cu=INR`;
+        "upi://pay?pa=" +
+        encodeURIComponent(window.UPI_ID) +
+        "&pn=" +
+        encodeURIComponent("AJ ESPORTS OFFICIAL") +
+        "&am=" +
+        amount.toFixed(2) +
+        "&cu=INR";
 
 
     window.location.href = url;
+
 }
 
 
@@ -556,7 +662,6 @@ async function submitEntry() {
     const paymentId =
         document.getElementById("joinPaymentId").value.trim();
 
-
     const msg =
         document.getElementById("joinMessage");
 
@@ -567,16 +672,15 @@ async function submitEntry() {
             "Phone number and Payment ID required.";
 
         return;
+
     }
 
 
     msg.innerText = "Submitting...";
 
 
-    /* Find numeric User_Data.id using login email */
-
     const { data: profile, error: profileError } =
-        await supabase
+        await supabaseClient
         .from("User_Data")
         .select("id")
         .eq("Email", currentUser.email)
@@ -589,31 +693,37 @@ async function submitEntry() {
             "User profile not found.";
 
         return;
+
     }
 
 
-    /* Save transaction */
-
     const { error } =
-        await supabase
+        await supabaseClient
         .from("Transactions")
         .insert({
 
             Phone: phone,
 
-            Amount: Number(selectedMatch["Entry fee"] || 0),
+            Amount:
+                Number(selectedMatch["Entry fee"] || 0),
 
-            Type: "Tournament Entry",
+            Type:
+                "Tournament Entry",
 
-            Status: "Pending",
+            Status:
+                "Pending",
 
-            "Payment id": paymentId,
+            "Payment id":
+                paymentId,
 
-            Payment: "PhonePe / UPI",
+            Payment:
+                "PhonePe / UPI",
 
-            User_id: profile.id,
+            User_id:
+                profile.id,
 
-            Match_id: selectedMatch.id
+            Match_id:
+                selectedMatch.id
 
         });
 
@@ -621,19 +731,20 @@ async function submitEntry() {
     if (error) {
 
         msg.innerText =
-            "Submission failed: " + error.message;
+            "Submission failed: " +
+            error.message;
 
         return;
+
     }
 
 
     msg.innerText =
         "✅ Payment submitted. Waiting for admin approval.";
 
-    setTimeout(() => {
+    setTimeout(function () {
 
         closeJoin();
-
         loadEntries();
 
     }, 1500);
@@ -654,54 +765,60 @@ async function loadEntries() {
     if (!currentUser) {
 
         container.innerHTML =
-            `<div class="loading">Please login first.</div>`;
+            '<div class="loading">Please login first.</div>';
 
         return;
+
     }
 
 
-    const { data: profile } =
-        await supabase
+    const { data: profile, error: profileError } =
+        await supabaseClient
         .from("User_Data")
         .select("id")
         .eq("Email", currentUser.email)
         .single();
 
 
-    if (!profile) {
+    if (profileError || !profile) {
 
         container.innerHTML =
-            `<div class="error">Profile not found.</div>`;
+            '<div class="error">Profile not found.</div>';
 
         return;
+
     }
 
 
     const { data, error } =
-        await supabase
+        await supabaseClient
         .from("Transactions")
         .select(
             'id,Phone,Amount,Type,Status,"Payment id",Payment,User_id,Match_id'
         )
         .eq("User_id", profile.id)
-        .order("id", { ascending:false });
+        .order("id", { ascending: false });
 
 
     if (error) {
 
         container.innerHTML =
-            `<div class="error">${error.message}</div>`;
+            '<div class="error">' +
+            escapeHTML(error.message) +
+            '</div>';
 
         return;
+
     }
 
 
     if (!data || data.length === 0) {
 
         container.innerHTML =
-            `<div class="loading">No entries yet.</div>`;
+            '<div class="loading">No entries yet.</div>';
 
         return;
+
     }
 
 
@@ -711,7 +828,7 @@ async function loadEntries() {
     for (const entry of data) {
 
         const { data: match } =
-            await supabase
+            await supabaseClient
             .from("Matches")
             .select(
                 'Title,"Room id","Room pass"'
@@ -731,57 +848,59 @@ async function loadEntries() {
         card.className = "card";
 
 
-        card.innerHTML = `
+        card.innerHTML =
 
-            <h3>
-                ${escapeHTML(
-                    match?.Title || "Tournament"
-                )}
-            </h3>
+            '<h3>' +
+            escapeHTML(match?.Title || "Tournament") +
+            '</h3>' +
 
-            <p>
-                Payment:
-                <b>${escapeHTML(entry.Status || "")}</b>
-            </p>
+            '<p>Payment: <b>' +
+            escapeHTML(entry.Status || "") +
+            '</b></p>' +
 
-            <p>
-                Amount:
-                <b>₹${entry.Amount ?? 0}</b>
-            </p>
+            '<p>Amount: <b>₹' +
+            (entry.Amount ?? 0) +
+            '</b></p>';
 
-            ${
-                approved
-                ?
-                `
-                <div class="roomBox">
 
-                    <h3>🎮 ROOM DETAILS</h3>
+        if (approved) {
 
-                    <p>
-                        Room ID:
-                        <strong>
-                            ${escapeHTML(match?.["Room id"] || "Not added")}
-                        </strong>
-                    </p>
+            const room =
+                document.createElement("div");
 
-                    <p>
-                        Room Password:
-                        <strong>
-                            ${escapeHTML(match?.["Room pass"] || "Not added")}
-                        </strong>
-                    </p>
+            room.className = "roomBox";
 
-                </div>
-                `
-                :
-                `
-                <div class="pending">
-                    ⏳ Waiting for admin approval
-                </div>
-                `
-            }
+            room.innerHTML =
 
-        `;
+                '<h3>🎮 ROOM DETAILS</h3>' +
+
+                '<p>Room ID: <strong>' +
+                escapeHTML(
+                    match?.["Room id"] || "Not added"
+                ) +
+                '</strong></p>' +
+
+                '<p>Room Password: <strong>' +
+                escapeHTML(
+                    match?.["Room pass"] || "Not added"
+                ) +
+                '</strong></p>';
+
+            card.appendChild(room);
+
+        } else {
+
+            const pending =
+                document.createElement("div");
+
+            pending.className = "pending";
+
+            pending.innerText =
+                "⏳ Waiting for admin approval";
+
+            card.appendChild(pending);
+
+        }
 
 
         container.appendChild(card);
@@ -822,7 +941,7 @@ function showSection(section) {
 
 
 /* =========================
-   SECURITY HELPERS
+   ESCAPE HTML
 ========================= */
 
 function escapeHTML(value) {
@@ -833,19 +952,38 @@ function escapeHTML(value) {
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+
 }
 
 
-supabase.auth.onAuthStateChange((_event, session) => {
+/* =========================
+   AUTH STATE
+========================= */
 
-    currentUser = session?.user || null;
+if (typeof window.supabase !== "undefined") {
 
-    updateLoginUI();
+    setTimeout(function () {
 
-});
+        if (supabaseClient) {
 
+            supabaseClient.auth.onAuthStateChange(
+                function (_event, session) {
+
+                    currentUser =
+                        session?.user || null;
+
+                    updateLoginUI();
+
+                }
+            );
+
+        }
+
+    }, 1000);
+
+}
 
 </script>
 
 </body>
-  </html>
+</html>
