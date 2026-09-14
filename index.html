@@ -3,130 +3,425 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AJ ESPORTS OFFICIAL</title>
 
 <link rel="stylesheet" href="style.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+
+<style>
+/* =========================
+   BASIC SAFETY
+========================= */
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+}
+
+button,
+input{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+button:disabled{
+    cursor:not-allowed;
+    opacity:.6;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    display:none;
+    position:fixed;
+    z-index:9999;
+    inset:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.75);
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.modalBox{
+    width:100%;
+    max-width:430px;
+    background:#11162b;
+    border:1px solid #30385e;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    position:relative;
+}
+
+.modalBox h2{
+    margin-top:0;
+    margin-bottom:20px;
+}
+
+.modalBox input{
+    width:100%;
+    padding:14px;
+    margin:7px 0;
+    border:1px solid #394267;
+    border-radius:10px;
+    background:#080b18;
+    color:white;
+    outline:none;
+    font-size:15px;
+}
+
+.modalBox input:focus{
+    border-color:#9b4dff;
+}
+
+.close{
+    position:absolute;
+    right:18px;
+    top:12px;
+    font-size:30px;
+    cursor:pointer;
+    color:#aaa;
+}
+
+.close:hover{
+    color:white;
+}
+
+#authSwitch{
+    text-align:center;
+    margin-top:18px;
+    color:#a86cff;
+    cursor:pointer;
+}
+
+#authMessage,
+#joinMessage{
+    margin-top:15px;
+    line-height:1.5;
+}
+
+/* =========================
+   JOIN
+========================= */
+
+.priceBox{
+    background:#080b18;
+    border:1px solid #353d63;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:12px;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.upiBox{
+    text-align:center;
+    margin-top:15px;
+    padding:18px;
+    border-radius:14px;
+    background:#080b18;
+    border:1px solid #353d63;
+}
+
+.upiBox strong{
+    display:block;
+    font-size:18px;
+    margin:10px 0 15px;
+    color:#b36cff;
+    word-break:break-all;
+}
+
+.payBtn{
+    width:100%;
+    border:0;
+    border-radius:10px;
+    padding:13px;
+    background:#5b2cff;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.note{
+    font-size:12px;
+    color:#999;
+    margin-bottom:0;
+    line-height:1.5;
+}
+
+.roomBox{
+    margin-top:15px;
+    padding:15px;
+    border-radius:12px;
+    background:#081b15;
+    border:1px solid #1e7b5c;
+}
+
+.roomBox h3{
+    margin-top:0;
+}
+
+.pending{
+    margin-top:15px;
+    padding:12px;
+    border-radius:10px;
+    background:#27220b;
+    color:#ffd86b;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.error{
+    padding:18px;
+    margin:10px 0;
+    border-radius:12px;
+    background:#321016;
+    border:1px solid #8d3040;
+    color:#ff9ca8;
+    word-break:break-word;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+    header{
+        padding:15px 4% !important;
+    }
+
+    .nav{
+        gap:8px !important;
+        flex-wrap:wrap;
+    }
+
+    .nav button{
+        font-size:14px !important;
+        padding:10px 14px !important;
+    }
+
+    .hero{
+        min-height:550px !important;
+    }
+
+    .modal{
+        padding:12px;
+    }
+
+    .modalBox{
+        max-height:90vh;
+        overflow-y:auto;
+        padding:20px;
+    }
+}
+</style>
 </head>
 
 <body>
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header>
+
     <div class="logo">
         AJ ESPORTS <span>OFFICIAL</span>
     </div>
 
     <div class="nav">
-        <button onclick="showSection('matches')">Tournaments</button>
-        <button onclick="showSection('entries')">My Entries</button>
 
-        <button id="loginBtn" onclick="openAuth()">Login</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none">
+        <button type="button" onclick="showSection('matches')">
+            Tournaments
+        </button>
+
+        <button type="button" onclick="showSection('entries')">
+            My Entries
+        </button>
+
+        <button
+            type="button"
+            id="loginBtn"
+            onclick="openAuth()">
+            Login
+        </button>
+
+        <button
+            type="button"
+            id="logoutBtn"
+            onclick="logout()"
+            style="display:none">
             Logout
         </button>
+
     </div>
+
 </header>
 
 
+<!-- =========================
+     HERO
+========================= -->
+
 <section class="hero">
+
     <div>
-        <p class="small">WELCOME TO</p>
+
+        <p class="small">
+            WELCOME TO
+        </p>
 
         <h1>
             AJ ESPORTS<br>
             <span>OFFICIAL</span>
         </h1>
 
-        <p>Compete • Pay Entry • Play • Win</p>
+        <p>
+            Compete • Pay Entry • Play • Win
+        </p>
 
-        <button class="mainBtn" onclick="showSection('matches')">
+        <button
+            type="button"
+            class="mainBtn"
+            onclick="showSection('matches')">
             JOIN TOURNAMENT
         </button>
+
     </div>
+
 </section>
 
+
+<!-- =========================
+     TOURNAMENTS
+========================= -->
 
 <section id="matches" class="section">
 
-    <h2>🔥 LIVE TOURNAMENTS</h2>
+    <h2>
+        🔥 LIVE TOURNAMENTS
+    </h2>
 
     <div id="matchesList" class="cards">
+
         <div class="loading">
             Loading tournaments...
         </div>
+
     </div>
 
 </section>
 
 
-<section id="entries" class="section" style="display:none">
+<!-- =========================
+     MY ENTRIES
+========================= -->
 
-    <h2>🎮 MY ENTRIES</h2>
+<section
+    id="entries"
+    class="section"
+    style="display:none">
+
+    <h2>
+        🎮 MY ENTRIES
+    </h2>
 
     <div id="entriesList" class="cards">
+
         <div class="loading">
             Login to see your entries.
         </div>
+
     </div>
 
 </section>
 
 
-<!-- LOGIN / SIGNUP MODAL -->
+<!-- =========================
+     LOGIN / SIGNUP MODAL
+========================= -->
 
-<div id="authModal" class="modal">
+<div
+    id="authModal"
+    class="modal">
 
     <div class="modalBox">
 
-        <span class="close" onclick="closeAuth()">×</span>
+        <span
+            class="close"
+            onclick="closeAuth()">
+            ×
+        </span>
 
-        <h2 id="authTitle">Login</h2>
+        <h2 id="authTitle">
+            Login
+        </h2>
 
         <input
             id="authEmail"
             type="email"
-            placeholder="Email"
-        >
+            autocomplete="email"
+            placeholder="Email">
 
         <input
             id="authPassword"
             type="password"
-            placeholder="Password"
-        >
+            autocomplete="current-password"
+            placeholder="Password">
 
-
-        <div id="signupFields" style="display:none">
+        <div
+            id="signupFields"
+            style="display:none">
 
             <input
                 id="username"
-                placeholder="Username"
-            >
+                type="text"
+                placeholder="Username">
 
             <input
                 id="phone"
-                placeholder="Phone Number"
-            >
+                type="tel"
+                placeholder="Phone Number">
 
             <input
                 id="ffid"
-                placeholder="Free Fire ID"
-            >
+                type="text"
+                placeholder="Free Fire ID">
 
         </div>
 
-
         <button
+            type="button"
             class="mainBtn"
-            onclick="authAction()"
             id="authActionBtn"
-        >
+            onclick="authAction()">
+
             LOGIN
+
         </button>
 
+        <p
+            id="authSwitch"
+            onclick="toggleAuth()">
 
-        <p id="authSwitch" onclick="toggleAuth()">
             Create new account
+
         </p>
 
         <p id="authMessage"></p>
@@ -136,53 +431,61 @@
 </div>
 
 
+<!-- =========================
+     JOIN MODAL
+========================= -->
 
-<!-- JOIN TOURNAMENT MODAL -->
-
-<div id="joinModal" class="modal">
+<div
+    id="joinModal"
+    class="modal">
 
     <div class="modalBox">
 
-        <span class="close" onclick="closeJoin()">×</span>
+        <span
+            class="close"
+            onclick="closeJoin()">
+            ×
+        </span>
 
         <h2 id="joinTitle">
             Join Tournament
         </h2>
 
-
         <div class="priceBox">
+
             Entry Fee:
             ₹<span id="joinFee">0</span>
-        </div>
 
+        </div>
 
         <input
             id="joinPhone"
-            placeholder="Phone Number"
-        >
+            type="tel"
+            placeholder="Phone Number">
 
         <input
             id="joinPaymentId"
-            placeholder="Payment / UTR ID"
-        >
-
+            type="text"
+            placeholder="Payment / UTR ID">
 
         <div class="upiBox">
 
-            <p>Pay using UPI</p>
+            <p>
+                Pay using UPI
+            </p>
 
             <strong id="upiText">
                 ajesportsofficial@ibl
             </strong>
 
-
             <button
+                type="button"
                 onclick="payUPI()"
-                class="payBtn"
-            >
-                💳 PAY NOW
-            </button>
+                class="payBtn">
 
+                💳 PAY NOW
+
+            </button>
 
             <p class="note">
                 First pay the exact entry fee,
@@ -191,14 +494,14 @@
 
         </div>
 
-
         <button
+            type="button"
             class="mainBtn"
-            onclick="submitEntry()"
-        >
-            SUBMIT PAYMENT
-        </button>
+            onclick="submitEntry()">
 
+            SUBMIT PAYMENT
+
+        </button>
 
         <p id="joinMessage"></p>
 
@@ -207,51 +510,106 @@
 </div>
 
 
+<!-- =========================
+     FOOTER
+========================= -->
+
 <footer>
     AJ ESPORTS OFFICIAL © 2026
 </footer>
 
 
-
 <script>
 
-let supabaseClient = null;
-let currentUser = null;
-let selectedMatch = null;
-let signupMode = false;
-
+/* =========================================================
+   AJ ESPORTS OFFICIAL
+   SUPABASE TOURNAMENT WEBSITE
+========================================================= */
 
 
 /* =========================
-   SUPABASE START
+   GLOBAL VARIABLES
 ========================= */
 
-function startSupabase() {
+let supabaseClient = null;
 
-    if (!window.supabase) {
+let currentUser = null;
 
-        showError(
-            "Supabase library load nahi hui."
-        );
+let selectedMatch = null;
 
-        return false;
+let signupMode = false;
+
+
+/* =========================
+   HELPER
+========================= */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================
+   SHOW ERROR
+========================= */
+
+function showError(message){
+
+    console.error("AJ ESPORTS ERROR:", message);
+
+    const container =
+        document.getElementById("matchesList");
+
+    if(container){
+
+        container.innerHTML =
+            '<div class="error">' +
+            '<b>Website Error</b><br>' +
+            escapeHTML(message) +
+            '</div>';
+
     }
 
-
-    if (
-        !window.SUPABASE_URL ||
-        !window.SUPABASE_ANON_KEY
-    ) {
-
-        showError(
-            "Supabase configuration missing."
-        );
-
-        return false;
-    }
+}
 
 
-    try {
+/* =========================
+   START SUPABASE
+========================= */
+
+function startSupabase(){
+
+    try{
+
+        if(!window.supabase){
+
+            showError(
+                "Supabase library load nahi hui. Internet connection check karo."
+            );
+
+            return false;
+        }
+
+
+        if(
+            !window.SUPABASE_URL ||
+            !window.SUPABASE_ANON_KEY
+        ){
+
+            showError(
+                "config.js me Supabase URL ya Anon Key missing hai."
+            );
+
+            return false;
+        }
+
 
         supabaseClient =
             window.supabase.createClient(
@@ -259,13 +617,19 @@ function startSupabase() {
                 window.SUPABASE_ANON_KEY
             );
 
+
+        console.log(
+            "Supabase connected successfully."
+        );
+
+
         return true;
 
-    } catch (error) {
+    }catch(error){
 
         showError(
-            "Supabase connection error: "
-            + error.message
+            "Supabase connection error: " +
+            error.message
         );
 
         return false;
@@ -274,28 +638,50 @@ function startSupabase() {
 }
 
 
-
 /* =========================
-   PAGE LOAD
+   PAGE START
 ========================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    async function () {
+    async function(){
 
-        if (!startSupabase()) return;
+        console.log(
+            "AJ ESPORTS website started."
+        );
 
 
-        try {
+        const started =
+            startSupabase();
 
-            const result =
-                await supabaseClient.auth.getSession();
+
+        if(!started){
+
+            return;
+        }
+
+
+        try{
+
+            const {
+                data,
+                error
+            } =
+            await supabaseClient.auth.getSession();
+
+
+            if(error){
+
+                console.error(
+                    "Session error:",
+                    error
+                );
+
+            }
 
 
             currentUser =
-                result.data.session
-                ? result.data.session.user
-                : null;
+                data?.session?.user || null;
 
 
             updateLoginUI();
@@ -304,9 +690,31 @@ document.addEventListener(
             await loadMatches();
 
 
-        } catch (error) {
+            supabaseClient.auth.onAuthStateChange(
+                function(event, session){
 
-            showError(error.message);
+                    console.log(
+                        "Auth event:",
+                        event
+                    );
+
+
+                    currentUser =
+                        session?.user || null;
+
+
+                    updateLoginUI();
+
+                }
+            );
+
+
+        }catch(error){
+
+            showError(
+                "Website start error: " +
+                error.message
+            );
 
         }
 
@@ -314,252 +722,356 @@ document.addEventListener(
 );
 
 
-
 /* =========================
-   ERROR
+   LOGIN UI
 ========================= */
 
-function showError(message) {
+function updateLoginUI(){
 
-    const container =
-        document.getElementById(
-            "matchesList"
-        );
+    const loginBtn =
+        document.getElementById("loginBtn");
+
+    const logoutBtn =
+        document.getElementById("logoutBtn");
 
 
-    if (container) {
+    if(!loginBtn || !logoutBtn){
 
-        container.innerHTML =
-            '<div class="error">' +
-            'Error: ' +
-            escapeHTML(message) +
-            '</div>';
+        return;
+    }
+
+
+    if(currentUser){
+
+        loginBtn.style.display = "none";
+
+        logoutBtn.style.display = "block";
+
+    }else{
+
+        loginBtn.style.display = "block";
+
+        logoutBtn.style.display = "none";
+
+    }
+
+}
+
+
+/* =========================
+   OPEN AUTH
+========================= */
+
+function openAuth(){
+
+    const modal =
+        document.getElementById("authModal");
+
+
+    if(!modal){
+
+        alert("Login window error.");
+
+        return;
+    }
+
+
+    modal.style.display = "flex";
+
+
+    setTimeout(
+        function(){
+
+            const email =
+                document.getElementById("authEmail");
+
+            if(email){
+
+                email.focus();
+
+            }
+
+        },
+        100
+    );
+
+}
+
+
+/* =========================
+   CLOSE AUTH
+========================= */
+
+function closeAuth(){
+
+    const modal =
+        document.getElementById("authModal");
+
+
+    if(modal){
+
+        modal.style.display = "none";
+
+    }
+
+}
+
+
+/* =========================
+   TOGGLE LOGIN / SIGNUP
+========================= */
+
+function toggleAuth(){
+
+    signupMode =
+        !signupMode;
+
+
+    const title =
+        document.getElementById("authTitle");
+
+    const action =
+        document.getElementById("authActionBtn");
+
+    const fields =
+        document.getElementById("signupFields");
+
+    const switchText =
+        document.getElementById("authSwitch");
+
+    const message =
+        document.getElementById("authMessage");
+
+
+    if(signupMode){
+
+        title.innerText =
+            "Create Account";
+
+        action.innerText =
+            "CREATE ACCOUNT";
+
+        fields.style.display =
+            "block";
+
+        switchText.innerText =
+            "Already have an account? Login";
+
+    }else{
+
+        title.innerText =
+            "Login";
+
+        action.innerText =
+            "LOGIN";
+
+        fields.style.display =
+            "none";
+
+        switchText.innerText =
+            "Create new account";
 
     }
 
 
-    console.error(message);
+    message.innerText = "";
 
 }
-
-
-
-/* =========================
-   AUTH MODAL
-========================= */
-
-function openAuth() {
-
-    document.getElementById(
-        "authModal"
-    ).style.display = "flex";
-
-}
-
-
-function closeAuth() {
-
-    document.getElementById(
-        "authModal"
-    ).style.display = "none";
-
-}
-
-
-
-/* =========================
-   LOGIN / SIGNUP SWITCH
-========================= */
-
-function toggleAuth() {
-
-    signupMode = !signupMode;
-
-
-    document.getElementById(
-        "authTitle"
-    ).innerText =
-        signupMode
-        ? "Create Account"
-        : "Login";
-
-
-    document.getElementById(
-        "authActionBtn"
-    ).innerText =
-        signupMode
-        ? "CREATE ACCOUNT"
-        : "LOGIN";
-
-
-    document.getElementById(
-        "signupFields"
-    ).style.display =
-        signupMode
-        ? "block"
-        : "none";
-
-
-    document.getElementById(
-        "authSwitch"
-    ).innerText =
-        signupMode
-        ? "Already have an account? Login"
-        : "Create new account";
-
-
-    document.getElementById(
-        "authMessage"
-    ).innerText = "";
-
-}
-
 
 
 /* =========================
    LOGIN / SIGNUP
 ========================= */
 
-async function authAction() {
+async function authAction(){
 
-    if (!supabaseClient) return;
+    if(!supabaseClient){
 
-
-    const email =
-        document.getElementById(
-            "authEmail"
-        ).value.trim();
-
-
-    const password =
-        document.getElementById(
-            "authPassword"
-        ).value;
-
-
-    const msg =
-        document.getElementById(
-            "authMessage"
+        alert(
+            "Supabase connection ready nahi hai."
         );
-
-
-    if (!email || !password) {
-
-        msg.innerText =
-            "Email and password required.";
 
         return;
     }
 
 
+    const email =
+        document
+        .getElementById("authEmail")
+        .value
+        .trim()
+        .toLowerCase();
 
-    /* LOGIN */
 
-    if (!signupMode) {
+    const password =
+        document
+        .getElementById("authPassword")
+        .value;
 
-        const { data, error } =
-            await supabaseClient.auth
-            .signInWithPassword({
+
+    const message =
+        document.getElementById("authMessage");
+
+
+    if(!email || !password){
+
+        message.innerText =
+            "Email and password required.";
+
+        return;
+
+    }
+
+
+    message.innerText =
+        "Please wait...";
+
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    if(!signupMode){
+
+        try{
+
+            const {
+                data,
+                error
+            } =
+            await supabaseClient.auth.signInWithPassword({
 
                 email: email,
+
                 password: password
 
             });
 
 
-        if (error) {
+            if(error){
 
-            msg.innerText =
+                message.innerText =
+                    error.message;
+
+                return;
+
+            }
+
+
+            currentUser =
+                data.user;
+
+
+            updateLoginUI();
+
+
+            message.innerText =
+                "Login successful.";
+
+
+            setTimeout(
+                function(){
+
+                    closeAuth();
+
+                    showSection("matches");
+
+                },
+                500
+            );
+
+
+        }catch(error){
+
+            message.innerText =
+                "Login error: " +
                 error.message;
 
-            return;
         }
 
 
-        currentUser = data.user;
-
-
-        updateLoginUI();
-
-
-        closeAuth();
-
-
-        await loadEntries();
-
-
         return;
+
     }
 
 
-
-    /* SIGNUP */
+    /* =========================
+       SIGNUP
+    ========================= */
 
     const username =
-        document.getElementById(
-            "username"
-        ).value.trim();
+        document
+        .getElementById("username")
+        .value
+        .trim();
 
 
     const phone =
-        document.getElementById(
-            "phone"
-        ).value.trim();
+        document
+        .getElementById("phone")
+        .value
+        .trim();
 
 
     const ffid =
-        document.getElementById(
-            "ffid"
-        ).value.trim();
+        document
+        .getElementById("ffid")
+        .value
+        .trim();
 
 
-    if (
-        !username ||
-        !phone ||
-        !ffid
-    ) {
+    if(!username || !phone || !ffid){
 
-        msg.innerText =
+        message.innerText =
             "Username, phone and Free Fire ID required.";
 
         return;
+
     }
 
 
-    const { data, error } =
-        await supabaseClient.auth
-        .signUp({
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient.auth.signUp({
 
             email: email,
+
             password: password
 
         });
 
 
-    if (error) {
+        if(error){
 
-        msg.innerText =
-            error.message;
+            message.innerText =
+                error.message;
 
-        return;
-    }
+            return;
 
-
-    if (!data.user) {
-
-        msg.innerText =
-            "Account created. Check your email.";
-
-        return;
-    }
+        }
 
 
+        if(!data?.user){
 
-    /* SAVE PROFILE */
+            message.innerText =
+                "Account created. Please login.";
 
-    const {
-        error: profileError
-    } =
+            return;
+
+        }
+
+
+        /* =========================
+           SAVE PROFILE
+        ========================= */
+
+        const {
+            error: profileError
+        } =
         await supabaseClient
         .from("User_Data")
         .insert({
@@ -577,33 +1089,101 @@ async function authAction() {
         });
 
 
-    if (profileError) {
+        if(profileError){
 
-        msg.innerText =
-            "Account created, but profile save failed: "
-            + profileError.message;
+            console.error(
+                "Profile save error:",
+                profileError
+            );
 
-        return;
+
+            message.innerText =
+                "Account created, but profile save failed: " +
+                profileError.message;
+
+            return;
+
+        }
+
+
+        message.innerText =
+            "✅ Account created successfully. Now login.";
+
+
+        document
+        .getElementById("authPassword")
+        .value = "";
+
+
+        setTimeout(
+            function(){
+
+                signupMode = true;
+
+                toggleAuth();
+
+                /* toggleAuth would reverse it,
+                   so set login mode manually */
+
+                signupMode = false;
+
+                document
+                .getElementById("authTitle")
+                .innerText = "Login";
+
+                document
+                .getElementById("authActionBtn")
+                .innerText = "LOGIN";
+
+                document
+                .getElementById("signupFields")
+                .style.display = "none";
+
+                document
+                .getElementById("authSwitch")
+                .innerText =
+                    "Create new account";
+
+            },
+            800
+        );
+
+
+    }catch(error){
+
+        message.innerText =
+            "Signup error: " +
+            error.message;
+
     }
 
-
-    msg.innerText =
-        "Account created successfully.";
-
 }
-
 
 
 /* =========================
    LOGOUT
 ========================= */
 
-async function logout() {
+async function logout(){
 
-    if (!supabaseClient) return;
+    if(!supabaseClient){
+
+        return;
+    }
 
 
-    await supabaseClient.auth.signOut();
+    try{
+
+        await supabaseClient.auth.signOut();
+
+    }catch(error){
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
 
 
     currentUser = null;
@@ -612,52 +1192,34 @@ async function logout() {
     updateLoginUI();
 
 
-    document.getElementById(
-        "entriesList"
-    ).innerHTML =
+    document
+    .getElementById("entriesList")
+    .innerHTML =
         '<div class="loading">' +
         'Login to see your entries.' +
         '</div>';
 
-}
 
-
-
-/* =========================
-   LOGIN UI
-========================= */
-
-function updateLoginUI() {
-
-    document.getElementById(
-        "loginBtn"
-    ).style.display =
-        currentUser
-        ? "none"
-        : "block";
-
-
-    document.getElementById(
-        "logoutBtn"
-    ).style.display =
-        currentUser
-        ? "block"
-        : "none";
+    showSection("matches");
 
 }
-
 
 
 /* =========================
    LOAD TOURNAMENTS
 ========================= */
 
-async function loadMatches() {
+async function loadMatches(){
 
     const container =
-        document.getElementById(
-            "matchesList"
-        );
+        document.getElementById("matchesList");
+
+
+    if(!container){
+
+        return;
+
+    }
 
 
     container.innerHTML =
@@ -666,10 +1228,12 @@ async function loadMatches() {
         '</div>';
 
 
-    const {
-        data,
-        error
-    } =
+    try{
+
+        const {
+            data,
+            error
+        } =
         await supabaseClient
         .from("Matches")
         .select(
@@ -678,315 +1242,313 @@ async function loadMatches() {
         .order(
             "id",
             {
-                ascending: false
+                ascending:false
             }
         );
 
 
-    if (error) {
+        if(error){
 
-        showError(error.message);
+            showError(
+                "Matches table error: " +
+                error.message
+            );
 
-        return;
-    }
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        container.innerHTML =
-            '<div class="loading">' +
-            'No tournaments available.' +
-            '</div>';
-
-        return;
-    }
-
-
-    container.innerHTML = "";
-
-
-
-    data.forEach(
-        function (match) {
-
-
-            const status =
-                String(
-                    match.Status || ""
-                ).toLowerCase();
-
-
-            const isLive =
-                status === "live" ||
-                status === "open" ||
-                status === "active";
-
-
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className = "card";
-
-
-
-            const top =
-                document.createElement(
-                    "div"
-                );
-
-
-            top.className =
-                "cardTop";
-
-
-            top.innerHTML =
-                '<span class="gameBadge">' +
-                'FREE FIRE MAX' +
-                '</span>' +
-
-                '<span class="' +
-                (
-                    isLive
-                    ? "live"
-                    : "closed"
-                ) +
-                '">' +
-
-                escapeHTML(
-                    match.Status ||
-                    "OPEN"
-                ) +
-
-                '</span>';
-
-
-
-            const title =
-                document.createElement(
-                    "h3"
-                );
-
-
-            title.innerText =
-                match.Title ||
-                "Tournament";
-
-
-
-            const stats =
-                document.createElement(
-                    "div"
-                );
-
-
-            stats.className =
-                "stats";
-
-
-            stats.innerHTML =
-
-                '<div>' +
-                '<small>ENTRY</small>' +
-                '<strong>₹' +
-                (
-                    match["Entry fee"] ??
-                    0
-                ) +
-                '</strong>' +
-                '</div>' +
-
-                '<div>' +
-                '<small>PER KILL</small>' +
-                '<strong>₹' +
-                (
-                    match["Per kill"] ??
-                    0
-                ) +
-                '</strong>' +
-                '</div>' +
-
-                '<div>' +
-                '<small>PRIZE</small>' +
-                '<strong>₹' +
-                (
-                    match["Prize pool"] ??
-                    0
-                ) +
-                '</strong>' +
-                '</div>';
-
-
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.className =
-                "mainBtn";
-
-
-            button.innerText =
-                isLive
-                ? "JOIN NOW"
-                : "CLOSED";
-
-
-            button.disabled =
-                !isLive;
-
-
-
-            if (isLive) {
-
-                button.addEventListener(
-                    "click",
-                    function () {
-
-                        openJoin(match);
-
-                    }
-                );
-
-            }
-
-
-
-            card.appendChild(top);
-
-            card.appendChild(title);
-
-            card.appendChild(stats);
-
-            card.appendChild(button);
-
-
-            container.appendChild(card);
+            return;
 
         }
-    );
+
+
+        if(!data || data.length === 0){
+
+            container.innerHTML =
+                '<div class="loading">' +
+                'No tournaments available.' +
+                '</div>';
+
+            return;
+
+        }
+
+
+        container.innerHTML = "";
+
+
+        data.forEach(
+            function(match){
+
+                const status =
+                    String(
+                        match.Status || ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const isOpen =
+                    status === "open" ||
+                    status === "live" ||
+                    status === "active";
+
+
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "card";
+
+
+                const top =
+                    document.createElement("div");
+
+                top.className =
+                    "cardTop";
+
+
+                top.innerHTML =
+                    '<span class="gameBadge">' +
+                    'FREE FIRE MAX' +
+                    '</span>' +
+
+                    '<span class="' +
+                    (isOpen ? "live" : "closed") +
+                    '">' +
+
+                    escapeHTML(
+                        match.Status || "OPEN"
+                    ) +
+
+                    '</span>';
+
+
+                const title =
+                    document.createElement("h3");
+
+                title.innerText =
+                    match.Title ||
+                    "Tournament";
+
+
+                const stats =
+                    document.createElement("div");
+
+                stats.className =
+                    "stats";
+
+
+                stats.innerHTML =
+
+                    '<div>' +
+                    '<small>ENTRY</small>' +
+                    '<strong>₹' +
+                    escapeHTML(
+                        match["Entry fee"] ?? 0
+                    ) +
+                    '</strong>' +
+                    '</div>' +
+
+                    '<div>' +
+                    '<small>PER KILL</small>' +
+                    '<strong>₹' +
+                    escapeHTML(
+                        match["Per kill"] ?? 0
+                    ) +
+                    '</strong>' +
+                    '</div>' +
+
+                    '<div>' +
+                    '<small>PRIZE</small>' +
+                    '<strong>₹' +
+                    escapeHTML(
+                        match["Prize pool"] ?? 0
+                    ) +
+                    '</strong>' +
+                    '</div>';
+
+
+                const button =
+                    document.createElement("button");
+
+
+                button.type =
+                    "button";
+
+
+                button.className =
+                    "mainBtn";
+
+
+                button.innerText =
+                    isOpen
+                    ? "JOIN NOW"
+                    : "CLOSED";
+
+
+                button.disabled =
+                    !isOpen;
+
+
+                if(isOpen){
+
+                    button.addEventListener(
+                        "click",
+                        function(){
+
+                            openJoin(match);
+
+                        }
+                    );
+
+                }
+
+
+                card.appendChild(top);
+
+                card.appendChild(title);
+
+                card.appendChild(stats);
+
+                card.appendChild(button);
+
+
+                container.appendChild(card);
+
+            }
+        );
+
+
+    }catch(error){
+
+        showError(
+            "Tournament loading error: " +
+            error.message
+        );
+
+    }
 
 }
-
 
 
 /* =========================
    OPEN JOIN
 ========================= */
 
-function openJoin(match) {
+function openJoin(match){
 
-    if (!currentUser) {
+    if(!currentUser){
 
         openAuth();
 
         return;
+
     }
 
 
-    selectedMatch = match;
+    selectedMatch =
+        match;
 
 
-    document.getElementById(
-        "joinTitle"
-    ).innerText =
+    document
+    .getElementById("joinTitle")
+    .innerText =
         match.Title ||
-        "Tournament";
+        "Join Tournament";
 
 
-    document.getElementById(
-        "joinFee"
-    ).innerText =
-        match["Entry fee"] ??
-        0;
+    document
+    .getElementById("joinFee")
+    .innerText =
+        match["Entry fee"] ?? 0;
 
 
-    document.getElementById(
-        "upiText"
-    ).innerText =
+    document
+    .getElementById("upiText")
+    .innerText =
         window.UPI_ID ||
         "ajesportsofficial@ibl";
 
 
-    document.getElementById(
-        "joinPhone"
-    ).value = "";
+    document
+    .getElementById("joinPhone")
+    .value = "";
 
 
-    document.getElementById(
-        "joinPaymentId"
-    ).value = "";
+    document
+    .getElementById("joinPaymentId")
+    .value = "";
 
 
-    document.getElementById(
-        "joinMessage"
-    ).innerText = "";
+    document
+    .getElementById("joinMessage")
+    .innerText = "";
 
 
-    document.getElementById(
-        "joinModal"
-    ).style.display =
+    document
+    .getElementById("joinModal")
+    .style.display =
         "flex";
 
 }
-
 
 
 /* =========================
    CLOSE JOIN
 ========================= */
 
-function closeJoin() {
+function closeJoin(){
 
-    document.getElementById(
-        "joinModal"
-    ).style.display =
+    document
+    .getElementById("joinModal")
+    .style.display =
         "none";
 
 }
-
 
 
 /* =========================
    UPI PAYMENT
 ========================= */
 
-function payUPI() {
+function payUPI(){
 
-    if (!selectedMatch) return;
+    if(!selectedMatch){
+
+        alert(
+            "Tournament select nahi hua."
+        );
+
+        return;
+
+    }
 
 
     const amount =
         Number(
-            selectedMatch["Entry fee"] ||
-            0
+            selectedMatch["Entry fee"] || 0
         );
 
 
-    if (amount <= 0) {
+    if(!amount || amount <= 0){
 
         alert(
-            "Entry fee is not set."
+            "Entry fee set nahi hai."
         );
 
         return;
+
     }
 
 
-    const url =
+    const upi =
+        window.UPI_ID ||
+        "ajesportsofficial@ibl";
+
+
+    const upiURL =
         "upi://pay" +
+
         "?pa=" +
-        encodeURIComponent(
-            window.UPI_ID
-        ) +
+        encodeURIComponent(upi) +
 
         "&pn=" +
         encodeURIComponent(
@@ -999,180 +1561,314 @@ function payUPI() {
         "&cu=INR";
 
 
-    window.location.href = url;
+    window.location.href =
+        upiURL;
 
 }
 
 
-
 /* =========================
-   SUBMIT TOURNAMENT ENTRY
+   FIND USER PROFILE
 ========================= */
 
-async function submitEntry() {
+async function getUserProfile(){
 
-    if (
-        !currentUser ||
-        !selectedMatch
-    ) {
+    if(!currentUser){
+
+        return {
+            profile:null,
+            error:new Error(
+                "User is not logged in."
+            )
+        };
+
+    }
+
+
+    const email =
+        String(
+            currentUser.email || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if(!email){
+
+        return {
+            profile:null,
+            error:new Error(
+                "Login email not available."
+            )
+        };
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient
+        .from("User_Data")
+        .select("id,Email")
+        .ilike(
+            "Email",
+            email
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+        if(error){
+
+            return {
+                profile:null,
+                error:error
+            };
+
+        }
+
+
+        if(!data){
+
+            return {
+                profile:null,
+                error:new Error(
+                    "Profile not found for " +
+                    email
+                )
+            };
+
+        }
+
+
+        return {
+            profile:data,
+            error:null
+        };
+
+
+    }catch(error){
+
+        return {
+            profile:null,
+            error:error
+        };
+
+    }
+
+}
+
+
+/* =========================
+   SUBMIT ENTRY
+========================= */
+
+async function submitEntry(){
+
+    const message =
+        document
+        .getElementById("joinMessage");
+
+
+    if(!currentUser){
+
+        message.innerText =
+            "Please login first.";
 
         return;
+
+    }
+
+
+    if(!selectedMatch){
+
+        message.innerText =
+            "Tournament select nahi hua.";
+
+        return;
+
     }
 
 
     const phone =
-        document.getElementById(
-            "joinPhone"
-        ).value.trim();
+        document
+        .getElementById("joinPhone")
+        .value
+        .trim();
 
 
     const paymentId =
-        document.getElementById(
-            "joinPaymentId"
-        ).value.trim();
+        document
+        .getElementById("joinPaymentId")
+        .value
+        .trim();
 
 
-    const msg =
-        document.getElementById(
-            "joinMessage"
-        );
+    if(!phone || !paymentId){
 
-
-    if (
-        !phone ||
-        !paymentId
-    ) {
-
-        msg.innerText =
-            "Phone number and Payment ID required.";
+        message.innerText =
+            "Phone number and Payment/UTR ID required.";
 
         return;
+
     }
 
 
-    msg.innerText =
-        "Submitting...";
-
-
-
-    /* PROFILE LOOKUP */
-
-    const {
-        data: profile,
-        error: profileError
-    } =
-        await supabaseClient
-        .from("User_Data")
-        .select("id")
-        .ilike(
-            "Email",
-            currentUser.email.trim()
-        )
-        .maybeSingle();
-
-
-
-    if (
-        profileError ||
-        !profile
-    ) {
-
-        msg.innerText =
-            "User profile not found.";
-
-
-        console.error(
-            "User_Data profile lookup error:",
-            profileError
+    const amount =
+        Number(
+            selectedMatch["Entry fee"] || 0
         );
 
 
+    if(amount <= 0){
+
+        message.innerText =
+            "Invalid entry fee.";
+
         return;
+
     }
 
 
+    message.innerText =
+        "Submitting payment details...";
 
-    /* SAVE TRANSACTION */
 
-    const {
-        error
-    } =
+    try{
+
+        /* =========================
+           PROFILE
+        ========================= */
+
+        const {
+            profile,
+            error: profileError
+        } =
+        await getUserProfile();
+
+
+        if(profileError || !profile){
+
+            console.error(
+                "Profile lookup error:",
+                profileError
+            );
+
+
+            message.innerText =
+                "Profile not found: " +
+                (
+                    profileError?.message ||
+                    "Unknown error"
+                );
+
+            return;
+
+        }
+
+
+        /* =========================
+           TRANSACTION
+        ========================= */
+
+        const {
+            error
+        } =
         await supabaseClient
         .from("Transactions")
         .insert({
 
             Phone: phone,
 
-            Amount:
-                Number(
-                    selectedMatch["Entry fee"] ||
-                    0
-                ),
+            Amount: amount,
 
-            Type:
-                "Tournament Entry",
+            Type: "Tournament Entry",
 
-            Status:
-                "Pending",
+            Status: "Pending",
 
-            "Payment id":
-                paymentId,
+            "Payment id": paymentId,
 
-            Payment:
-                "PhonePe / UPI",
+            Payment: "PhonePe / UPI",
 
-            User_id:
-                profile.id,
+            User_id: profile.id,
 
-            Match_id:
-                selectedMatch.id
+            Match_id: selectedMatch.id
 
         });
 
 
+        if(error){
 
-    if (error) {
+            console.error(
+                "Transaction error:",
+                error
+            );
 
-        msg.innerText =
-            "Submission failed: " +
+
+            message.innerText =
+                "Submission failed: " +
+                error.message;
+
+            return;
+
+        }
+
+
+        message.innerText =
+            "✅ Payment submitted successfully. Waiting for admin approval.";
+
+
+        setTimeout(
+            async function(){
+
+                closeJoin();
+
+                await loadEntries();
+
+            },
+            1200
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Submit entry error:",
+            error
+        );
+
+
+        message.innerText =
+            "Error: " +
             error.message;
 
-        return;
     }
-
-
-    msg.innerText =
-        "✅ Payment submitted. Waiting for admin approval.";
-
-
-    setTimeout(
-        function () {
-
-            closeJoin();
-
-            loadEntries();
-
-        },
-        1500
-    );
 
 }
 
 
-
 /* =========================
-   MY ENTRIES
+   LOAD MY ENTRIES
 ========================= */
 
-async function loadEntries() {
+async function loadEntries(){
 
     const container =
-        document.getElementById(
-            "entriesList"
-        );
+        document.getElementById("entriesList");
 
 
-    if (!currentUser) {
+    if(!container){
+
+        return;
+
+    }
+
+
+    if(!currentUser){
 
         container.innerHTML =
             '<div class="loading">' +
@@ -1180,59 +1876,58 @@ async function loadEntries() {
             '</div>';
 
         return;
+
     }
 
 
-
-    /* PROFILE LOOKUP */
-
-    const {
-        data: profile,
-        error: profileError
-    } =
-        await supabaseClient
-        .from("User_Data")
-        .select("id")
-        .ilike(
-            "Email",
-            currentUser.email.trim()
-        )
-        .maybeSingle();
+    container.innerHTML =
+        '<div class="loading">' +
+        'Loading your entries...' +
+        '</div>';
 
 
+    try{
 
-    if (
-        profileError ||
-        !profile
-    ) {
+        /* =========================
+           PROFILE
+        ========================= */
 
-        container.innerHTML =
-            '<div class="error">' +
-            'Profile error: ' +
-            escapeHTML(
-                profileError?.message ||
-                "Profile not found"
-            ) +
-            '</div>';
+        const {
+            profile,
+            error: profileError
+        } =
+        await getUserProfile();
 
 
-        console.error(
-            "User_Data profile lookup error:",
-            profileError
-        );
+        if(profileError || !profile){
+
+            container.innerHTML =
+                '<div class="error">' +
+                '<b>Profile not found</b><br>' +
+                escapeHTML(
+                    profileError?.message ||
+                    "Profile does not exist."
+                ) +
+                '</div>';
+
+            console.error(
+                "Profile lookup error:",
+                profileError
+            );
+
+            return;
+
+        }
 
 
-        return;
-    }
+        /* =========================
+           TRANSACTIONS
+        ========================= */
 
-
-
-    /* GET TRANSACTIONS */
-
-    const {
-        data,
-        error
-    } =
+        const {
+            data,
+            error
+        } =
         await supabaseClient
         .from("Transactions")
         .select(
@@ -1245,13 +1940,181 @@ async function loadEntries() {
         .order(
             "id",
             {
-                ascending: false
+                ascending:false
             }
         );
 
 
+        if(error){
 
-    if (error) {
+            container.innerHTML =
+                '<div class="error">' +
+                '<b>Entries error</b><br>' +
+                escapeHTML(
+                    error.message
+                ) +
+                '</div>';
+
+            return;
+
+        }
+
+
+        if(!data || data.length === 0){
+
+            container.innerHTML =
+                '<div class="loading">' +
+                'No entries yet.' +
+                '</div>';
+
+            return;
+
+        }
+
+
+        container.innerHTML = "";
+
+
+        for(
+            const entry of data
+        ){
+
+            let match = null;
+
+
+            if(entry.Match_id){
+
+                const result =
+                    await supabaseClient
+                    .from("Matches")
+                    .select(
+                        'Title,"Room id","Room pass"'
+                    )
+                    .eq(
+                        "id",
+                        entry.Match_id
+                    )
+                    .maybeSingle();
+
+
+                match =
+                    result.data || null;
+
+            }
+
+
+            const approved =
+                String(
+                    entry.Status || ""
+                )
+                .trim()
+                .toLowerCase()
+                ===
+                "approved";
+
+
+            const card =
+                document.createElement("div");
+
+
+            card.className =
+                "card";
+
+
+            card.innerHTML =
+
+                '<h3>' +
+                escapeHTML(
+                    match?.Title ||
+                    "Tournament"
+                ) +
+                '</h3>' +
+
+                '<p>Payment Status: <b>' +
+                escapeHTML(
+                    entry.Status ||
+                    "Pending"
+                ) +
+                '</b></p>' +
+
+                '<p>Amount: <b>₹' +
+                escapeHTML(
+                    entry.Amount ?? 0
+                ) +
+                '</b></p>';
+
+
+            if(approved){
+
+                const room =
+                    document.createElement("div");
+
+
+                room.className =
+                    "roomBox";
+
+
+                room.innerHTML =
+
+                    '<h3>🎮 ROOM DETAILS</h3>' +
+
+                    '<p>Room ID: <strong>' +
+
+                    escapeHTML(
+                        match?.["Room id"] ||
+                        "Not added yet"
+                    ) +
+
+                    '</strong></p>' +
+
+                    '<p>Room Password: <strong>' +
+
+                    escapeHTML(
+                        match?.["Room pass"] ||
+                        "Not added yet"
+                    ) +
+
+                    '</strong></p>';
+
+
+                card.appendChild(room);
+
+
+            }else{
+
+                const pending =
+                    document.createElement("div");
+
+
+                pending.className =
+                    "pending";
+
+
+                pending.innerText =
+                    "⏳ Waiting for admin approval";
+
+
+                card.appendChild(
+                    pending
+                );
+
+            }
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            "Entries error:",
+            error
+        );
+
 
         container.innerHTML =
             '<div class="error">' +
@@ -1260,19 +2123,174 @@ async function loadEntries() {
             ) +
             '</div>';
 
+    }
+
+}
+
+
+/* =========================
+   SECTION SWITCH
+========================= */
+
+function showSection(section){
+
+    const matches =
+        document.getElementById("matches");
+
+    const entries =
+        document.getElementById("entries");
+
+
+    if(!matches || !entries){
+
         return;
+
     }
 
 
+    if(section === "matches"){
 
-    if (
-        !data ||
-        data.length === 0
-    ) {
+        matches.style.display =
+            "block";
 
-        container.innerHTML =
-            '<div class="loading">' +
-            'No entries yet.' +
-            '</div>';
+        entries.style.display =
+            "none";
 
-     
+    }else if(section === "entries"){
+
+        matches.style.display =
+            "none";
+
+        entries.style.display =
+            "block";
+
+
+        if(!currentUser){
+
+            openAuth();
+
+        }else{
+
+            loadEntries();
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   CLOSE MODALS WHEN CLICK
+   OUTSIDE BOX
+========================= */
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        const authModal =
+            document.getElementById(
+                "authModal"
+            );
+
+        const joinModal =
+            document.getElementById(
+                "joinModal"
+            );
+
+
+        if(
+            event.target === authModal
+        ){
+
+            closeAuth();
+
+        }
+
+
+        if(
+            event.target === joinModal
+        ){
+
+            closeJoin();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   ESC KEY
+========================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Escape"){
+
+            closeAuth();
+
+            closeJoin();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   MAKE FUNCTIONS GLOBAL
+========================= */
+
+window.openAuth =
+    openAuth;
+
+window.closeAuth =
+    closeAuth;
+
+window.toggleAuth =
+    toggleAuth;
+
+window.authAction =
+    authAction;
+
+window.logout =
+    logout;
+
+window.showSection =
+    showSection;
+
+window.openJoin =
+    openJoin;
+
+window.closeJoin =
+    closeJoin;
+
+window.payUPI =
+    payUPI;
+
+window.submitEntry =
+    submitEntry;
+
+window.loadMatches =
+    loadMatches;
+
+window.loadEntries =
+    loadEntries;
+
+
+/* =========================
+   FINAL CHECK
+========================= */
+
+console.log(
+    "AJ ESPORTS OFFICIAL JS loaded successfully."
+);
+
+</script>
+
+</body>
+</html>
