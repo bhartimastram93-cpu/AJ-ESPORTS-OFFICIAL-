@@ -683,8 +683,8 @@ async function submitEntry() {
         await supabaseClient
         .from("User_Data")
         .select("id")
-        .eq("Email", currentUser.email)
-        .single();
+        .eq("Email", currentUser.email.trim())
+        .maybesingle();
 
 
     if (profileError || !profile) {
