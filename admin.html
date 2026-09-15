@@ -1,224 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>AJ ESPORTS ADMIN</title>
-
-<link rel="stylesheet" href="style.css">
+<title>AJ ESPORTS OFFICIAL - ADMIN</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
 
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#080b18;
+    color:white;
+    padding:18px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.header h1{
+    color:#00e5ff;
+    margin-bottom:6px;
+}
+
+.header p{
+    color:#aaa;
+}
+
+.card{
+    background:#11172b;
+    border:1px solid #26304d;
+    border-radius:15px;
+    padding:18px;
+    margin-bottom:18px;
+}
+
+h2{
+    margin-bottom:15px;
+    color:#00e5ff;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    margin:7px 0;
+    border-radius:9px;
+    border:1px solid #303b5e;
+    background:#080d1d;
+    color:white;
+    outline:none;
+}
+
+button{
+    border:0;
+    border-radius:9px;
+    padding:12px 16px;
+    margin:5px 3px 5px 0;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.add{
+    background:#00e5ff;
+    color:#001018;
+}
+
+.approve{
+    background:#20d878;
+    color:#001b0d;
+}
+
+.reject{
+    background:#ff4057;
+    color:white;
+}
+
+.logout{
+    background:#333b55;
+    color:white;
+}
+
+.refresh{
+    background:#6c5ce7;
+    color:white;
+}
+
+.entry{
+    background:#0b1122;
+    border:1px solid #273250;
+    border-radius:12px;
+    padding:15px;
+    margin-top:12px;
+}
+
+.status{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    background:#26304d;
+    margin:5px 0;
+    font-size:13px;
+}
+
+.msg{
+    margin-top:10px;
+    color:#00e5ff;
+}
+
+.hidden{
+    display:none;
+}
+
+.error{
+    color:#ff6578;
+}
+
+.success{
+    color:#35e28b;
+}
+
+.small{
+    color:#999;
+    font-size:13px;
+    margin-top:5px;
+}
+</style>
 </head>
-
 
 <body>
 
-<header>
+<div class="container">
 
-<div class="logo">
-AJ ESPORTS <span>ADMIN</span>
+    <div class="header">
+        <h1>👑 AJ ESPORTS OFFICIAL</h1>
+        <p>Admin Dashboard</p>
+        <p id="adminEmail"></p>
+
+        <button class="logout" onclick="logout()">
+            🚪 LOGOUT
+        </button>
+    </div>
+
+
+    <!-- LOGIN / ACCESS MESSAGE -->
+
+    <div id="accessBox" class="card">
+        Checking admin access...
+    </div>
+
+
+    <!-- ADMIN AREA -->
+
+    <div id="adminArea" class="hidden">
+
+
+        <!-- ADD TOURNAMENT -->
+
+        <div class="card">
+
+            <h2>➕ Add Tournament</h2>
+
+            <input
+                id="title"
+                placeholder="Tournament Title"
+            >
+
+            <input
+                id="entryFee"
+                type="number"
+                placeholder="Entry Fee"
+            >
+
+            <input
+                id="perKill"
+                type="number"
+                placeholder="Per Kill"
+                value="0"
+            >
+
+            <input
+                id="prizePool"
+                type="number"
+                placeholder="Prize Pool"
+            >
+
+            <select id="matchStatus">
+                <option value="Open">Open</option>
+                <option value="Closed">Closed</option>
+            </select>
+
+            <button
+                class="add"
+                onclick="addTournament()"
+            >
+                ➕ ADD TOURNAMENT
+            </button>
+
+            <p id="addMessage" class="msg"></p>
+
+        </div>
+
+
+        <!-- TOURNAMENTS -->
+
+        <div class="card">
+
+            <h2>🏆 Tournaments</h2>
+
+            <button
+                class="refresh"
+                onclick="loadMatches()"
+            >
+                🔄 REFRESH
+            </button>
+
+            <div id="matches">
+                Loading...
+            </div>
+
+        </div>
+
+
+        <!-- TRANSACTIONS -->
+
+        <div class="card">
+
+            <h2>💳 Payment Entries</h2>
+
+            <button
+                class="refresh"
+                onclick="loadTransactions()"
+            >
+                🔄 REFRESH ENTRIES
+            </button>
+
+            <div id="transactions">
+                Loading...
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
-
-<button onclick="logout()">
-Logout
-</button>
-
-</header>
-
-
-<section class="section">
-
-<h2>🛠 ADMIN PANEL</h2>
-
-<div id="adminMessage"></div>
-
-<div id="transactions">
-
-Loading...
-
-</div>
-
-</section>
 
 
 <script>
 
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+"https://otjwqfxvaxfgjibwtlkq.supabase.co";
+
+/*
+   IMPORTANT:
+   Yahan apna EXISTING SUPABASE ANON/PUBLISHABLE KEY
+   paste karo.
+
+   Service Role Key kabhi mat paste karna.
+*/
+
+const SUPABASE_ANON_KEY =
+"PASTE_YOUR_EXISTING_ANON_KEY_HERE";
+
+
 const supabase =
 window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
 );
+
+
+/* =========================
+   ADMIN
+========================= */
+
+const ADMIN_EMAIL =
+"bhartiamarjeet619@gmail.com";
 
 
 /* =========================
    CHECK ADMIN
 ========================= */
 
-async function checkAdmin() {
+async function checkAdmin(){
 
-    const { data } =
-        await supabase.auth.getSession();
+    const accessBox =
+        document.getElementById("accessBox");
+
+    const adminArea =
+        document.getElementById("adminArea");
+
+    const {
+        data,
+        error
+    } =
+    await supabase.auth.getSession();
 
 
-    if (!data.session) {
+    if(error){
 
-        showLogin();
+        accessBox.innerHTML =
+        `<p class="error">
+        ❌ Session error: ${escapeHTML(error.message)}
+        </p>`;
+
+        return;
+    }
+
+
+    const session =
+        data.session;
+
+
+    if(!session){
+
+        accessBox.innerHTML =
+        `<p class="error">
+        ❌ Please login first.
+        </p>
+        <br>
+        <button class="add"
+        onclick="goHome()">
+        LOGIN
+        </button>`;
 
         return;
     }
 
 
     const email =
-        data.session.user.email;
+        session.user.email || "";
 
 
-    if (
-        String(email).toLowerCase() !==
-        String(window.ADMIN_EMAIL).toLowerCase()
-    ) {
+    document.getElementById(
+        "adminEmail"
+    ).innerText =
+        email;
 
-        document.body.innerHTML =
-            `
-            <div class="section">
-                <h2>Access Denied ❌</h2>
-                <p>This account is not an admin account.</p>
-            </div>
-            `;
+
+    if(
+        email.toLowerCase() !==
+        ADMIN_EMAIL.toLowerCase()
+    ){
+
+        accessBox.innerHTML =
+        `<p class="error">
+        ❌ Admin access denied.
+        </p>`;
+
+        await supabase.auth.signOut();
 
         return;
     }
 
 
-    loadTransactions();
+    accessBox.innerHTML =
+    `<p class="success">
+    ✅ Admin verified successfully.
+    </p>`;
+
+
+    adminArea.classList.remove(
+        "hidden"
+    );
+
+
+    await loadMatches();
+
+    await loadTransactions();
 
 }
 
 
 /* =========================
-   LOGIN
+   ADD TOURNAMENT
 ========================= */
 
-function showLogin() {
+async function addTournament(){
 
-    document.getElementById("transactions").innerHTML = `
+    const title =
+        document.getElementById(
+            "title"
+        ).value.trim();
 
-        <div class="loginBox">
+    const entryFee =
+        document.getElementById(
+            "entryFee"
+        ).value;
 
-            <h2>Admin Login</h2>
+    const perKill =
+        document.getElementById(
+            "perKill"
+        ).value || 0;
 
-            <input
-                id="email"
-                type="email"
-                placeholder="Admin Email"
-            >
+    const prizePool =
+        document.getElementById(
+            "prizePool"
+        ).value;
 
-            <input
-                id="password"
-                type="password"
-                placeholder="Password"
-            >
+    const status =
+        document.getElementById(
+            "matchStatus"
+        ).value;
 
-            <button
-                class="mainBtn"
-                onclick="login()"
-            >
-                LOGIN
-            </button>
-
-            <p id="loginMessage"></p>
-
-        </div>
-
-    `;
-
-}
+    const message =
+        document.getElementById(
+            "addMessage"
+        );
 
 
-async function login() {
+    if(
+        !title ||
+        entryFee === "" ||
+        prizePool === ""
+    ){
 
-    const email =
-        document.getElementById("email").value.trim();
+        message.innerHTML =
+        `<span class="error">
+        Please fill Title, Entry Fee and Prize Pool.
+        </span>`;
 
-    const password =
-        document.getElementById("password").value;
+        return;
+    }
 
 
-    const { data, error } =
-        await supabase.auth.signInWithPassword({
+    const { error } =
+        await supabase
+        .from("Matches")
+        .insert({
 
-            email,
-            password
+            Title: title,
+
+            "Entry fee":
+                Number(entryFee),
+
+            "Per kill":
+                Number(perKill),
+
+            "Prize pool":
+                Number(prizePool),
+
+            Status: status
 
         });
 
 
-    if (error) {
+    if(error){
 
-        document.getElementById("loginMessage")
-        .innerText = error.message;
-
-        return;
-    }
-
-
-    if (
-        email.toLowerCase() !==
-        window.ADMIN_EMAIL.toLowerCase()
-    ) {
-
-        await supabase.auth.signOut();
-
-        document.getElementById("loginMessage")
-        .innerText = "Not an admin account.";
+        message.innerHTML =
+        `<span class="error">
+        ❌ ${escapeHTML(error.message)}
+        </span>`;
 
         return;
     }
 
 
-    loadTransactions();
+    message.innerHTML =
+    `<span class="success">
+    ✅ Tournament added successfully!
+    </span>`;
+
+
+    document.getElementById(
+        "title"
+    ).value = "";
+
+    document.getElementById(
+        "entryFee"
+    ).value = "";
+
+    document.getElementById(
+        "perKill"
+    ).value = "0";
+
+    document.getElementById(
+        "prizePool"
+    ).value = "";
+
+
+    await loadMatches();
 
 }
 
 
 /* =========================
-   LOAD TRANSACTIONS
+   LOAD MATCHES
 ========================= */
 
-async function loadTransactions() {
+async function loadMatches(){
 
     const box =
-        document.getElementById("transactions");
+        document.getElementById(
+            "matches"
+        );
 
 
-    const { data, error } =
-        await supabase
-        .from("Transactions")
-        .select(
-            'id,Phone,Amount,Type,Status,"Payment id",Payment,User_id,Match_id'
-        )
-        .order("id", { ascending:false });
+    const {
+        data,
+        error
+    } =
+    await supabase
+    .from("Matches")
+    .select(
+        'id,Title,"Entry fee","Per kill","Prize pool",Status,"Room id","Room pass"'
+    )
+    .order(
+        "id",
+        { ascending:false }
+    );
 
 
-    if (error) {
+    if(error){
 
         box.innerHTML =
-            `<div class="error">${error.message}</div>`;
+        `<p class="error">
+        ❌ ${escapeHTML(error.message)}
+        </p>`;
 
         return;
     }
 
 
-    if (!data || data.length === 0) {
+    if(!data || data.length === 0){
 
         box.innerHTML =
-            `<div class="loading">No transactions.</div>`;
+        "<p>No tournaments found.</p>";
 
         return;
     }
@@ -227,201 +551,439 @@ async function loadTransactions() {
     box.innerHTML = "";
 
 
-    for (const t of data) {
+    data.forEach(function(match){
 
-        const { data: match } =
-            await supabase
-            .from("Matches")
-            .select(
-                'Title,"Room id","Room pass"'
-            )
-            .eq("id", t.Match_id)
-            .single();
-
-
-        const card =
+        const div =
             document.createElement("div");
 
-        card.className = "adminCard";
+        div.className =
+            "entry";
 
 
-        card.innerHTML = `
+        div.innerHTML = `
 
             <h3>
-                ${escapeHTML(
-                    match?.Title || "Unknown Tournament"
-                )}
+                ${escapeHTML(match.Title || "Tournament")}
             </h3>
 
-            <p>
-                Phone:
-                <b>${escapeHTML(t.Phone)}</b>
+            <p class="small">
+                Match ID: ${match.id}
             </p>
 
             <p>
-                Amount:
-                <b>₹${t.Amount}</b>
+                💰 Entry:
+                ₹${match["Entry fee"] || 0}
             </p>
 
             <p>
-                Payment ID:
-                <b>${escapeHTML(t["Payment id"])}</b>
+                🎯 Per Kill:
+                ₹${match["Per kill"] || 0}
             </p>
 
             <p>
-                Status:
-                <b>${escapeHTML(t.Status)}</b>
+                🏆 Prize:
+                ₹${match["Prize pool"] || 0}
             </p>
 
-            <div class="adminInputs">
+            <p class="status">
+                ${escapeHTML(match.Status || "-")}
+            </p>
 
-                <input
-                    id="room_${t.id}"
-                    placeholder="Room ID"
-                    value="${escapeHTML(match?.["Room id"] || "")}"
-                >
+            <input
+                id="room_match_${match.id}"
+                placeholder="Room ID"
+                value="${escapeHTML(match["Room id"] || "")}"
+            >
 
-                <input
-                    id="pass_${t.id}"
-                    placeholder="Room Password"
-                    value="${escapeHTML(match?.["Room pass"] || "")}"
-                >
-
-            </div>
+            <input
+                id="pass_match_${match.id}"
+                placeholder="Room Password"
+                value="${escapeHTML(match["Room pass"] || "")}"
+            >
 
             <button
                 class="approve"
-                onclick="approve(${t.id}, ${t.Match_id})"
+                onclick="saveRoom(${match.id})"
             >
-                ✅ APPROVE
-            </button>
-
-            <button
-                class="reject"
-                onclick="reject(${t.id})"
-            >
-                ❌ REJECT
+                💾 SAVE ROOM
             </button>
 
         `;
 
 
-        box.appendChild(card);
+        box.appendChild(div);
 
-    }
+    });
 
 }
 
 
 /* =========================
-   APPROVE
+   SAVE ROOM
 ========================= */
 
-async function approve(transactionId, matchId) {
+async function saveRoom(matchId){
 
     const room =
         document.getElementById(
-            `room_${transactionId}`
+            `room_match_${matchId}`
         ).value.trim();
 
     const pass =
         document.getElementById(
-            `pass_${transactionId}`
+            `pass_match_${matchId}`
         ).value.trim();
 
 
-    if (!room || !pass) {
+    if(!room || !pass){
 
-        alert("Room ID and Room Password required.");
+        alert(
+            "Room ID and Room Password required."
+        );
 
         return;
     }
 
 
-    /* Update Match */
-
-    const { error: matchError } =
+    const { error } =
         await supabase
         .from("Matches")
         .update({
 
             "Room id": room,
-
             "Room pass": pass
 
         })
-        .eq("id", matchId);
+        .eq(
+            "id",
+            matchId
+        );
 
 
-    if (matchError) {
+    if(error){
 
-        alert(matchError.message);
-
-        return;
-    }
-
-
-    /* Approve transaction */
-
-    const { error } =
-        await supabase
-        .from("Transactions")
-        .update({
-
-            Status: "Approved"
-
-        })
-        .eq("id", transactionId);
-
-
-    if (error) {
-
-        alert(error.message);
+        alert(
+            "❌ " +
+            error.message
+        );
 
         return;
     }
 
 
-    alert("Approved successfully!");
+    alert(
+        "✅ Room details saved!"
+    );
 
-    loadTransactions();
+
+    await loadMatches();
 
 }
 
 
 /* =========================
-   REJECT
+   LOAD TRANSACTIONS
 ========================= */
 
-async function reject(id) {
+async function loadTransactions(){
 
-    const ok =
-        confirm("Reject this payment?");
-
-
-    if (!ok) return;
-
-
-    const { error } =
-        await supabase
-        .from("Transactions")
-        .update({
-
-            Status: "Rejected"
-
-        })
-        .eq("id", id);
+    const box =
+        document.getElementById(
+            "transactions"
+        );
 
 
-    if (error) {
+    box.innerHTML =
+        "Loading entries...";
 
-        alert(error.message);
+
+    const {
+        data,
+        error
+    } =
+    await supabase
+    .from("Transactions")
+    .select(
+        'id,Phone,Amount,Type,Status,"Payment id",Payment,User_id,Match_id'
+    )
+    .order(
+        "id",
+        { ascending:false }
+    );
+
+
+    if(error){
+
+        box.innerHTML =
+        `<p class="error">
+        ❌ ${escapeHTML(error.message)}
+        </p>`;
 
         return;
     }
 
 
-    loadTransactions();
+    if(!data || data.length === 0){
+
+        box.innerHTML =
+        "<p>No payment entries.</p>";
+
+        return;
+    }
+
+
+    box.innerHTML = "";
+
+
+    data.forEach(function(t){
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "entry";
+
+
+        div.innerHTML = `
+
+            <p>
+                <b>Entry ID:</b>
+                ${t.id}
+            </p>
+
+            <p>
+                📱 <b>Phone:</b>
+                ${escapeHTML(t.Phone || "-")}
+            </p>
+
+            <p>
+                💰 <b>Amount:</b>
+                ₹${t.Amount || 0}
+            </p>
+
+            <p>
+                🧾 <b>Payment ID:</b>
+                ${escapeHTML(t["Payment id"] || "-")}
+            </p>
+
+            <p>
+                🎮 <b>Match ID:</b>
+                ${t.Match_id || "-"}
+            </p>
+
+            <p>
+                <span class="status">
+                    ${escapeHTML(t.Status || "-")}
+                </span>
+            </p>
+
+            ${
+                t.Status !== "Approved"
+                ?
+                `
+                <button
+                    class="approve"
+                    onclick="approveEntry(${t.id}, ${t.Match_id})"
+                >
+                    ✅ APPROVE
+                </button>
+
+                <button
+                    class="reject"
+                    onclick="rejectEntry(${t.id})"
+                >
+                    ❌ REJECT
+                </button>
+                `
+                :
+                `
+                <p class="success">
+                    ✅ Already Approved
+                </p>
+                `
+            }
+
+        `;
+
+
+        box.appendChild(div);
+
+    });
+
+}
+
+
+/* =========================
+   APPROVE ENTRY
+========================= */
+
+async function approveEntry(
+    transactionId,
+    matchId
+){
+
+    if(!matchId){
+
+        alert(
+            "Match ID missing."
+        );
+
+        return;
+    }
+
+
+    const roomInput =
+        document.getElementById(
+            `room_match_${matchId}`
+        );
+
+
+    const passInput =
+        document.getElementById(
+            `pass_match_${matchId}`
+        );
+
+
+    if(!roomInput || !passInput){
+
+        alert(
+            "Please set Room ID and Password in the tournament section first."
+        );
+
+        return;
+    }
+
+
+    const room =
+        roomInput.value.trim();
+
+    const pass =
+        passInput.value.trim();
+
+
+    if(!room || !pass){
+
+        alert(
+            "Room ID and Room Password required."
+        );
+
+        return;
+    }
+
+
+    /* SAVE ROOM */
+
+    const {
+        error: roomError
+    } =
+    await supabase
+    .from("Matches")
+    .update({
+
+        "Room id": room,
+        "Room pass": pass
+
+    })
+    .eq(
+        "id",
+        matchId
+    );
+
+
+    if(roomError){
+
+        alert(
+            roomError.message
+        );
+
+        return;
+    }
+
+
+    /* APPROVE PAYMENT */
+
+    const {
+        error
+    } =
+    await supabase
+    .from("Transactions")
+    .update({
+
+        Status: "Approved"
+
+    })
+    .eq(
+        "id",
+        transactionId
+    );
+
+
+    if(error){
+
+        alert(
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        "✅ Payment approved!"
+    );
+
+
+    await loadTransactions();
+
+}
+
+
+/* =========================
+   REJECT ENTRY
+========================= */
+
+async function rejectEntry(id){
+
+    if(
+        !confirm(
+            "Reject this payment?"
+        )
+    ){
+
+        return;
+    }
+
+
+    const { error } =
+    await supabase
+    .from("Transactions")
+    .update({
+
+        Status: "Rejected"
+
+    })
+    .eq(
+        "id",
+        id
+    );
+
+
+    if(error){
+
+        alert(
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        "❌ Payment rejected."
+    );
+
+
+    await loadTransactions();
 
 }
 
@@ -430,7 +992,7 @@ async function reject(id) {
    LOGOUT
 ========================= */
 
-async function logout() {
+async function logout(){
 
     await supabase.auth.signOut();
 
@@ -439,17 +1001,39 @@ async function logout() {
 }
 
 
-function escapeHTML(value) {
+/* =========================
+   HOME
+========================= */
 
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+function goHome(){
+
+    location.href =
+        "index.html";
 
 }
 
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value){
+
+    return String(
+        value ?? ""
+    )
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================
+   START
+========================= */
 
 checkAdmin();
 
