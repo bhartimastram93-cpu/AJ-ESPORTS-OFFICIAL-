@@ -650,16 +650,46 @@ document.addEventListener(
             "AJ ESPORTS website started."
         );
 
-
         const started =
             startSupabase();
 
-
         if(!started){
-
             return;
         }
 
+        /* PASSWORD RECOVERY + AUTH LISTENER */
+
+        supabaseClient.auth.onAuthStateChange(
+            function(event, session){
+
+                console.log(
+                    "Auth event:",
+                    event
+                );
+
+                currentUser =
+                    session?.user || null;
+
+                updateLoginUI();
+
+                if(event === "PASSWORD_RECOVERY"){
+
+                    const modal =
+                        document.getElementById(
+                            "resetModal"
+                        );
+
+                    if(modal){
+
+                        modal.style.display =
+                            "flex";
+
+                    }
+
+                }
+
+            }
+        );
 
         try{
 
@@ -668,7 +698,6 @@ document.addEventListener(
                 error
             } =
             await supabaseClient.auth.getSession();
-
 
             if(error){
 
@@ -679,35 +708,12 @@ document.addEventListener(
 
             }
 
-
             currentUser =
                 data?.session?.user || null;
 
-
             updateLoginUI();
 
-
             await loadMatches();
-
-
-            supabaseClient.auth.onAuthStateChange(
-                function(event, session){
-
-                    console.log(
-                        "Auth event:",
-                        event
-                    );
-
-
-                    currentUser =
-                        session?.user || null;
-
-
-                    updateLoginUI();
-
-                }
-            );
-
 
         }catch(error){
 
