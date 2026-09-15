@@ -2,1038 +2,1856 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>AJ ESPORTS OFFICIAL - ADMIN</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AJ ESPORTS OFFICIAL — Admin V2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-    font-family:Arial,sans-serif;
-    background:#080b18;
-    color:white;
-    padding:18px;
+  font-family:Arial,sans-serif;
+  background:#070b16;
+  color:#fff;
+  min-height:100vh
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+
+#login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:20px
 }
 
-.container{
-    max-width:900px;
-    margin:auto;
+.loginbox,.card{
+  background:#101729;
+  border:1px solid #26334d;
+  border-radius:18px;
+  box-shadow:0 15px 45px #0007
 }
 
-.header{
-    text-align:center;
-    margin-bottom:25px;
+.loginbox{
+  width:min(430px,100%);
+  padding:28px
 }
 
-.header h1{
-    color:#00e5ff;
-    margin-bottom:6px;
+.logo{
+  text-align:center;
+  font-size:26px;
+  font-weight:900;
+  color:#6ee7ff;
+  margin-bottom:8px
 }
 
-.header p{
-    color:#aaa;
+.sub{
+  text-align:center;
+  color:#9aa8c2;
+  margin-bottom:24px
 }
 
-.card{
-    background:#11172b;
-    border:1px solid #26304d;
-    border-radius:15px;
-    padding:18px;
-    margin-bottom:18px;
+input,select,textarea{
+  width:100%;
+  background:#0a1020;
+  color:#fff;
+  border:1px solid #2b3855;
+  border-radius:10px;
+  padding:12px;
+  margin:7px 0;
+  outline:none
 }
 
-h2{
-    margin-bottom:15px;
-    color:#00e5ff;
+input:focus,select:focus,textarea:focus{
+  border-color:#55d8ff
 }
 
-input,select{
-    width:100%;
-    padding:13px;
-    margin:7px 0;
-    border-radius:9px;
-    border:1px solid #303b5e;
-    background:#080d1d;
-    color:white;
-    outline:none;
+textarea{
+  min-height:90px;
+  resize:vertical
 }
 
-button{
-    border:0;
-    border-radius:9px;
-    padding:12px 16px;
-    margin:5px 3px 5px 0;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.add{
-    background:#00e5ff;
-    color:#001018;
-}
-
-.approve{
-    background:#20d878;
-    color:#001b0d;
-}
-
-.reject{
-    background:#ff4057;
-    color:white;
-}
-
-.logout{
-    background:#333b55;
-    color:white;
-}
-
-.refresh{
-    background:#6c5ce7;
-    color:white;
-}
-
-.entry{
-    background:#0b1122;
-    border:1px solid #273250;
-    border-radius:12px;
-    padding:15px;
-    margin-top:12px;
-}
-
-.status{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    background:#26304d;
-    margin:5px 0;
-    font-size:13px;
-}
-
-.msg{
-    margin-top:10px;
-    color:#00e5ff;
-}
-
-.hidden{
-    display:none;
-}
-
-.error{
-    color:#ff6578;
+.primary{
+  background:#18b6f2;
+  color:#00131b;
+  padding:12px 16px;
+  border-radius:10px;
+  font-weight:800
 }
 
 .success{
-    color:#35e28b;
+  background:#16a34a;
+  color:white;
+  padding:9px 12px;
+  border-radius:9px
 }
 
-.small{
-    color:#999;
-    font-size:13px;
-    margin-top:5px;
+.danger{
+  background:#ef4444;
+  color:white;
+  padding:9px 12px;
+  border-radius:9px
+}
+
+.warn{
+  background:#eab308;
+  color:#111;
+  padding:9px 12px;
+  border-radius:9px
+}
+
+.secondary{
+  background:#26334d;
+  color:white;
+  padding:9px 12px;
+  border-radius:9px
+}
+
+#app{display:none}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:#0a1020ee;
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid #202b43;
+  padding:14px 18px
+}
+
+.head{
+  max-width:1400px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px
+}
+
+.brand{
+  font-weight:900;
+  font-size:20px
+}
+
+.adminmail{
+  font-size:12px;
+  color:#8fa0bc;
+  margin-top:4px
+}
+
+.wrap{
+  max-width:1400px;
+  margin:auto;
+  padding:18px
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  padding-bottom:12px
+}
+
+.tab{
+  white-space:nowrap;
+  background:#131d32;
+  color:#b9c6dd;
+  padding:11px 14px;
+  border-radius:10px
+}
+
+.tab.active{
+  background:#18b6f2;
+  color:#00131b;
+  font-weight:800
+}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px
+}
+
+.stat{padding:18px}
+
+.stat small{
+  color:#8fa0bc
+}
+
+.stat b{
+  display:block;
+  font-size:28px;
+  margin-top:8px
+}
+
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px
+}
+
+.card{
+  padding:18px;
+  margin-bottom:16px
+}
+
+h2{margin-bottom:14px}
+h3{margin-bottom:10px}
+
+.row{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px
+}
+
+.row3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:8px
+}
+
+.tablewrap{
+  overflow:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:850px
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #25304a;
+  text-align:left;
+  font-size:13px;
+  vertical-align:top
+}
+
+th{
+  color:#8fa0bc;
+  background:#0d1424
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800
+}
+
+.pending{
+  background:#493d0a;
+  color:#ffe68a
+}
+
+.approved{
+  background:#073d20;
+  color:#72f5a8
+}
+
+.rejected{
+  background:#4a1218;
+  color:#ff9aa5
+}
+
+.muted{
+  color:#8fa0bc
+}
+
+.msg{
+  margin-top:10px;
+  color:#6ee7ff;
+  min-height:20px
+}
+
+.search{
+  max-width:450px
+}
+
+footer{
+  text-align:center;
+  color:#66748d;
+  padding:25px
+}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .two{grid-template-columns:1fr}
+  .row3{grid-template-columns:1fr}
+}
+
+@media(max-width:520px){
+  .grid{grid-template-columns:1fr}
+  .wrap{padding:12px}
+  .card{padding:14px}
+  .head{
+    align-items:flex-start;
+    flex-direction:column
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- LOGIN -->
+<section id="login">
 
-    <div class="header">
-        <h1>👑 AJ ESPORTS OFFICIAL</h1>
-        <p>Admin Dashboard</p>
-        <p id="adminEmail"></p>
+<div class="loginbox">
 
-        <button class="logout" onclick="logout()">
-            🚪 LOGOUT
-        </button>
-    </div>
+<div class="logo">
+AJ ESPORTS OFFICIAL
+</div>
 
+<div class="sub">
+Admin Panel V2
+</div>
 
-    <!-- LOGIN / ACCESS MESSAGE -->
+<input
+id="loginEmail"
+type="email"
+placeholder="Admin email"
+>
 
-    <div id="accessBox" class="card">
-        Checking admin access...
-    </div>
+<input
+id="loginPassword"
+type="password"
+placeholder="Password"
+>
 
+<button
+class="primary"
+style="width:100%;margin-top:8px"
+onclick="adminLogin()"
+>
+LOGIN
+</button>
 
-    <!-- ADMIN AREA -->
+<div id="loginMsg" class="msg"></div>
 
-    <div id="adminArea" class="hidden">
+</div>
 
-
-        <!-- ADD TOURNAMENT -->
-
-        <div class="card">
-
-            <h2>➕ Add Tournament</h2>
-
-            <input
-                id="title"
-                placeholder="Tournament Title"
-            >
-
-            <input
-                id="entryFee"
-                type="number"
-                placeholder="Entry Fee"
-            >
-
-            <input
-                id="perKill"
-                type="number"
-                placeholder="Per Kill"
-                value="0"
-            >
-
-            <input
-                id="prizePool"
-                type="number"
-                placeholder="Prize Pool"
-            >
-
-            <select id="matchStatus">
-                <option value="Open">Open</option>
-                <option value="Closed">Closed</option>
-            </select>
-
-            <button
-                class="add"
-                onclick="addTournament()"
-            >
-                ➕ ADD TOURNAMENT
-            </button>
-
-            <p id="addMessage" class="msg"></p>
-
-        </div>
+</section>
 
 
-        <!-- TOURNAMENTS -->
+<!-- ADMIN APP -->
+<div id="app">
 
-        <div class="card">
+<header>
 
-            <h2>🏆 Tournaments</h2>
+<div class="head">
 
-            <button
-                class="refresh"
-                onclick="loadMatches()"
-            >
-                🔄 REFRESH
-            </button>
+<div>
 
-            <div id="matches">
-                Loading...
-            </div>
+<div class="brand">
+🎮 AJ ESPORTS OFFICIAL
+</div>
 
-        </div>
+<div
+class="adminmail"
+id="who"
+></div>
+
+</div>
+
+<button
+class="danger"
+onclick="logout()"
+>
+Logout
+</button>
+
+</div>
+
+</header>
 
 
-        <!-- TRANSACTIONS -->
+<main class="wrap">
 
-        <div class="card">
 
-            <h2>💳 Payment Entries</h2>
+<!-- TABS -->
 
-            <button
-                class="refresh"
-                onclick="loadTransactions()"
-            >
-                🔄 REFRESH ENTRIES
-            </button>
+<div class="tabs">
 
-            <div id="transactions">
-                Loading...
-            </div>
+<button
+class="tab active"
+onclick="showTab('dashboard',this)"
+>
+📊 Dashboard
+</button>
 
-        </div>
+<button
+class="tab"
+onclick="showTab('tournaments',this)"
+>
+🏆 Tournaments
+</button>
 
-    </div>
+<button
+class="tab"
+onclick="showTab('players',this)"
+>
+👥 Players
+</button>
 
+<button
+class="tab"
+onclick="showTab('payments',this)"
+>
+💳 Payments
+</button>
+
+<button
+class="tab"
+onclick="showTab('matches',this)"
+>
+🎮 Matches
+</button>
+
+<button
+class="tab"
+onclick="showTab('results',this)"
+>
+🏅 Results
+</button>
+
+<button
+class="tab"
+onclick="showTab('wallet',this)"
+>
+💰 Wallet
+</button>
+
+<button
+class="tab"
+onclick="showTab('notifications',this)"
+>
+🔔 Notifications
+</button>
+
+<button
+class="tab"
+onclick="showTab('activity',this)"
+>
+📝 Activity Log
+</button>
+
+<button
+class="tab"
+onclick="showTab('settings',this)"
+>
+⚙️ Settings
+</button>
+
+</div>
+
+
+<!-- DASHBOARD -->
+
+<section
+id="dashboard"
+class="panel active"
+>
+
+<div class="grid">
+
+<div class="card stat">
+<small>Total Players</small>
+<b id="sPlayers">0</b>
+</div>
+
+<div class="card stat">
+<small>Tournaments</small>
+<b id="sTournaments">0</b>
+</div>
+
+<div class="card stat">
+<small>Payments</small>
+<b id="sPayments">0</b>
+</div>
+
+<div class="card stat">
+<small>Pending</small>
+<b id="sPending">0</b>
+</div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card stat">
+<small>Approved Entries</small>
+<b id="sApproved">0</b>
+</div>
+
+<div class="card stat">
+<small>Rejected Entries</small>
+<b id="sRejected">0</b>
+</div>
+
+<div class="card stat">
+<small>Entry Revenue</small>
+<b id="sRevenue">₹0</b>
+</div>
+
+<div class="card stat">
+<small>Prize Paid</small>
+<b id="sPrize">₹0</b>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Quick Actions
+</h2>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="showTabByName('tournaments')"
+>
++ New Tournament
+</button>
+
+<button
+class="warn"
+onclick="showTabByName('payments')"
+>
+Review Payments
+</button>
+
+<button
+class="secondary"
+onclick="refreshAll()"
+>
+🔄 Refresh Everything
+</button>
+
+</div>
+
+<div id="dashMsg" class="msg"></div>
+
+</div>
+
+</section>
+
+
+<!-- TOURNAMENTS -->
+
+<section
+id="tournaments"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+🏆 Create Tournament
+</h2>
+
+<div class="row">
+
+<input
+id="tTitle"
+placeholder="Tournament title"
+>
+
+<input
+id="tFee"
+type="number"
+min="0"
+placeholder="Entry fee"
+>
+
+<input
+id="tKill"
+type="number"
+min="0"
+placeholder="Per kill"
+>
+
+<input
+id="tPrize"
+type="number"
+min="0"
+placeholder="Prize pool"
+>
+
+<input
+id="tDate"
+type="date"
+>
+
+<input
+id="tTime"
+type="time"
+>
+
+<input
+id="tMap"
+placeholder="Map / Mode e.g. Bermuda / 1v1"
+>
+
+<input
+id="tSlots"
+type="number"
+min="1"
+placeholder="Maximum slots"
+>
+
+</div>
+
+<select id="tStatus">
+
+<option>Open</option>
+<option>Closed</option>
+<option>Live</option>
+<option>Completed</option>
+
+</select>
+
+<textarea
+id="tRules"
+placeholder="Rules / notes"
+></textarea>
+
+<button
+class="primary"
+onclick="createTournament()"
+>
+CREATE TOURNAMENT
+</button>
+
+<div id="tMsg" class="msg"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Manage Tournaments
+</h2>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Title</th>
+<th>Fee</th>
+<th>Kill</th>
+<th>Prize</th>
+<th>Status</th>
+<th>Room</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tournamentsBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- PLAYERS -->
+
+<section
+id="players"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+👥 Players
+</h2>
+
+<input
+class="search"
+id="playerSearch"
+oninput="renderPlayers()"
+placeholder="Search username, email, phone or FF ID"
+>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Username</th>
+<th>Email</th>
+<th>Phone</th>
+<th>FF ID</th>
+<th>Wallet</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="playersBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- PAYMENTS -->
+
+<section
+id="payments"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+💳 Payment Verification
+</h2>
+
+<select
+id="payFilter"
+onchange="renderPayments()"
+>
+
+<option value="">
+All
+</option>
+
+<option>
+Pending
+</option>
+
+<option>
+Approved
+</option>
+
+<option>
+Rejected
+</option>
+
+</select>
+
+<input
+class="search"
+id="paySearch"
+oninput="renderPayments()"
+placeholder="Search UTR / phone / match ID"
+>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Player</th>
+<th>Phone</th>
+<th>Amount</th>
+<th>UTR</th>
+<th>Match</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="paymentsBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MATCHES -->
+
+<section
+id="matches"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+🎮 Room & Match Control
+</h2>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Match</th>
+<th>Title</th>
+<th>Status</th>
+<th>Room ID</th>
+<th>Room Pass</th>
+<th>Save</th>
+
+</tr>
+
+</thead>
+
+<tbody id="matchesBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- RESULTS -->
+
+<section
+id="results"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+🏅 Add / Update Result
+</h2>
+
+<div class="row3">
+
+<input
+id="rMatch"
+type="number"
+placeholder="Match ID"
+>
+
+<input
+id="rUser"
+type="number"
+placeholder="Player User ID"
+>
+
+<input
+id="rRank"
+type="number"
+placeholder="Rank"
+>
+
+<input
+id="rKills"
+type="number"
+placeholder="Kills"
+>
+
+<input
+id="rPrize"
+type="number"
+placeholder="Prize"
+>
+
+<input
+id="rNote"
+placeholder="Result note"
+>
+
+</div>
+
+<button
+class="primary"
+onclick="saveResult()"
+>
+SAVE RESULT
+</button>
+
+<div id="rMsg" class="msg"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Published Results
+</h2>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Match</th>
+<th>User</th>
+<th>Rank</th>
+<th>Kills</th>
+<th>Prize</th>
+<th>Note</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="resultsBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- WALLET -->
+
+<section
+id="wallet"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+💰 Wallet Adjustment
+</h2>
+
+<div class="row">
+
+<input
+id="wUser"
+type="number"
+placeholder="Player User ID"
+>
+
+<input
+id="wAmount"
+type="number"
+placeholder="Amount (+ credit / - debit)"
+>
+
+</div>
+
+<input
+id="wReason"
+placeholder="Reason"
+>
+
+<button
+class="primary"
+onclick="adjustWallet()"
+>
+UPDATE WALLET
+</button>
+
+<div id="wMsg" class="msg"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Wallet Transactions
+</h2>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>User</th>
+<th>Amount</th>
+<th>Reason</th>
+<th>Created</th>
+
+</tr>
+
+</thead>
+
+<tbody id="walletBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- NOTIFICATIONS -->
+
+<section
+id="notifications"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+🔔 Send Notification
+</h2>
+
+<div class="row">
+
+<input
+id="nUser"
+type="number"
+placeholder="Player User ID (blank = all)"
+>
+
+<input
+id="nTitle"
+placeholder="Notification title"
+>
+
+</div>
+
+<textarea
+id="nMessage"
+placeholder="Message"
+></textarea>
+
+<button
+class="primary"
+onclick="sendNotification()"
+>
+SEND NOTIFICATION
+</button>
+
+<div id="nMsg" class="msg"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Notification History
+</h2>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>User</th>
+<th>Title</th>
+<th>Message</th>
+<th>Created</th>
+
+</tr>
+
+</thead>
+
+<tbody id="notificationsBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ACTIVITY -->
+
+<section
+id="activity"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+📝 Activity Log
+</h2>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Admin</th>
+<th>Action</th>
+<th>Details</th>
+<th>Time</th>
+
+</tr>
+
+</thead>
+
+<tbody id="activityBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- SETTINGS -->
+
+<section
+id="settings"
+class="panel"
+>
+
+<div class="card">
+
+<h2>
+⚙️ Admin Settings
+</h2>
+
+<p class="muted">
+Admin email:
+</p>
+
+<input
+value="bhartiamarjeet619@gmail.com"
+readonly
+>
+
+<div class="card" style="margin-top:15px;background:#0b1221">
+
+<h3>
+UPI ID
+</h3>
+
+<input
+id="upi"
+value="ajesportsofficial@ibl"
+readonly
+>
+
+</div>
+
+</div>
+
+</section>
+
+
+<footer>
+AJ ESPORTS OFFICIAL • Admin V2
+</footer>
+
+</main>
 </div>
 
 
 <script>
 
-/* =========================
-   SUPABASE
-========================= */
+/* ==============================
+   SUPABASE CONFIG
+============================== */
 
 const SUPABASE_URL =
 "https://otjwqfxvaxfgjibwtlkq.supabase.co";
 
 /*
-
+PASTE YOUR EXISTING SUPABASE ANON/PUBLISHABLE KEY BELOW.
+DO NOT USE SERVICE_ROLE KEY.
 */
 
 const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90andxZnh2YXhmZ2ppYnd0bGtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MzYzMTEsImV4cCI6MjEwNDExMjMxMX0.-7c1LCvwcI0QD6-ZT5aBKAmVouuLU2HU_HTKkLFnbLc
-
-
-const supabase =
-window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
-
-
-/* =========================
-   ADMIN
-========================= */
+"PASTE_YOUR_EXISTING_SUPABASE_ANON_KEY_HERE";
 
 const ADMIN_EMAIL =
 "bhartiamarjeet619@gmail.com";
 
 
-/* =========================
-   CHECK ADMIN
-========================= */
-
-async function checkAdmin(){
-
-    const accessBox =
-        document.getElementById("accessBox");
-
-    const adminArea =
-        document.getElementById("adminArea");
-
-    const {
-        data,
-        error
-    } =
-    await supabase.auth.getSession();
+const sb =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+);
 
 
-    if(error){
+/* ==============================
+   VARIABLES
+============================== */
 
-        accessBox.innerHTML =
-        `<p class="error">
-        ❌ Session error: ${escapeHTML(error.message)}
-        </p>`;
+let currentUser = null;
 
-        return;
-    }
-
-
-    const session =
-        data.session;
-
-
-    if(!session){
-
-        accessBox.innerHTML =
-        `<p class="error">
-        ❌ Please login first.
-        </p>
-        <br>
-        <button class="add"
-        onclick="goHome()">
-        LOGIN
-        </button>`;
-
-        return;
-    }
+let players = [];
+let tournaments = [];
+let payments = [];
+let results = [];
+let wallets = [];
+let notifications = [];
+let activities = [];
 
 
-    const email =
-        session.user.email || "";
+/* ==============================
+   HELPERS
+============================== */
 
+function esc(v){
 
-    document.getElementById(
-        "adminEmail"
-    ).innerText =
-        email;
+return String(v ?? "")
+.replace(/[&<>"']/g,function(m){
 
+return {
 
-    if(
-        email.toLowerCase() !==
-        ADMIN_EMAIL.toLowerCase()
-    ){
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
 
-        accessBox.innerHTML =
-        `<p class="error">
-        ❌ Admin access denied.
-        </p>`;
+}[m];
 
-        await supabase.auth.signOut();
-
-        return;
-    }
-
-
-    accessBox.innerHTML =
-    `<p class="success">
-    ✅ Admin verified successfully.
-    </p>`;
-
-
-    adminArea.classList.remove(
-        "hidden"
-    );
-
-
-    await loadMatches();
-
-    await loadTransactions();
+});
 
 }
 
 
-/* =========================
-   ADD TOURNAMENT
-========================= */
+function msg(id,text){
 
-async function addTournament(){
+const e =
+document.getElementById(id);
 
-    const title =
-        document.getElementById(
-            "title"
-        ).value.trim();
-
-    const entryFee =
-        document.getElementById(
-            "entryFee"
-        ).value;
-
-    const perKill =
-        document.getElementById(
-            "perKill"
-        ).value || 0;
-
-    const prizePool =
-        document.getElementById(
-            "prizePool"
-        ).value;
-
-    const status =
-        document.getElementById(
-            "matchStatus"
-        ).value;
-
-    const message =
-        document.getElementById(
-            "addMessage"
-        );
-
-
-    if(
-        !title ||
-        entryFee === "" ||
-        prizePool === ""
-    ){
-
-        message.innerHTML =
-        `<span class="error">
-        Please fill Title, Entry Fee and Prize Pool.
-        </span>`;
-
-        return;
-    }
-
-
-    const { error } =
-        await supabase
-        .from("Matches")
-        .insert({
-
-            Title: title,
-
-            "Entry fee":
-                Number(entryFee),
-
-            "Per kill":
-                Number(perKill),
-
-            "Prize pool":
-                Number(prizePool),
-
-            Status: status
-
-        });
-
-
-    if(error){
-
-        message.innerHTML =
-        `<span class="error">
-        ❌ ${escapeHTML(error.message)}
-        </span>`;
-
-        return;
-    }
-
-
-    message.innerHTML =
-    `<span class="success">
-    ✅ Tournament added successfully!
-    </span>`;
-
-
-    document.getElementById(
-        "title"
-    ).value = "";
-
-    document.getElementById(
-        "entryFee"
-    ).value = "";
-
-    document.getElementById(
-        "perKill"
-    ).value = "0";
-
-    document.getElementById(
-        "prizePool"
-    ).value = "";
-
-
-    await loadMatches();
+if(e)
+e.textContent = text;
 
 }
 
 
-/* =========================
-   LOAD MATCHES
-========================= */
+/* ==============================
+   TABS
+============================== */
 
-async function loadMatches(){
+function showTab(name,btn){
 
-    const box =
-        document.getElementById(
-            "matches"
-        );
+document
+.querySelectorAll(".panel")
+.forEach(x =>
+x.classList.remove("active")
+);
 
+const panel =
+document.getElementById(name);
 
-    const {
-        data,
-        error
-    } =
-    await supabase
-    .from("Matches")
-    .select(
-        'id,Title,"Entry fee","Per kill","Prize pool",Status,"Room id","Room pass"'
-    )
-    .order(
-        "id",
-        { ascending:false }
-    );
+if(panel)
+panel.classList.add("active");
 
 
-    if(error){
+document
+.querySelectorAll(".tab")
+.forEach(x =>
+x.classList.remove("active")
+);
 
-        box.innerHTML =
-        `<p class="error">
-        ❌ ${escapeHTML(error.message)}
-        </p>`;
-
-        return;
-    }
-
-
-    if(!data || data.length === 0){
-
-        box.innerHTML =
-        "<p>No tournaments found.</p>";
-
-        return;
-    }
-
-
-    box.innerHTML = "";
-
-
-    data.forEach(function(match){
-
-        const div =
-            document.createElement("div");
-
-        div.className =
-            "entry";
-
-
-        div.innerHTML = `
-
-            <h3>
-                ${escapeHTML(match.Title || "Tournament")}
-            </h3>
-
-            <p class="small">
-                Match ID: ${match.id}
-            </p>
-
-            <p>
-                💰 Entry:
-                ₹${match["Entry fee"] || 0}
-            </p>
-
-            <p>
-                🎯 Per Kill:
-                ₹${match["Per kill"] || 0}
-            </p>
-
-            <p>
-                🏆 Prize:
-                ₹${match["Prize pool"] || 0}
-            </p>
-
-            <p class="status">
-                ${escapeHTML(match.Status || "-")}
-            </p>
-
-            <input
-                id="room_match_${match.id}"
-                placeholder="Room ID"
-                value="${escapeHTML(match["Room id"] || "")}"
-            >
-
-            <input
-                id="pass_match_${match.id}"
-                placeholder="Room Password"
-                value="${escapeHTML(match["Room pass"] || "")}"
-            >
-
-            <button
-                class="approve"
-                onclick="saveRoom(${match.id})"
-            >
-                💾 SAVE ROOM
-            </button>
-
-        `;
-
-
-        box.appendChild(div);
-
-    });
+if(btn)
+btn.classList.add("active");
 
 }
 
 
-/* =========================
-   SAVE ROOM
-========================= */
+function showTabByName(name){
 
-async function saveRoom(matchId){
+const btn =
+[...document.querySelectorAll(".tab")]
+.find(x =>
+x.getAttribute("onclick")
+?.includes("'" + name + "'")
+);
 
-    const room =
-        document.getElementById(
-            `room_match_${matchId}`
-        ).value.trim();
-
-    const pass =
-        document.getElementById(
-            `pass_match_${matchId}`
-        ).value.trim();
-
-
-    if(!room || !pass){
-
-        alert(
-            "Room ID and Room Password required."
-        );
-
-        return;
-    }
-
-
-    const { error } =
-        await supabase
-        .from("Matches")
-        .update({
-
-            "Room id": room,
-            "Room pass": pass
-
-        })
-        .eq(
-            "id",
-            matchId
-        );
-
-
-    if(error){
-
-        alert(
-            "❌ " +
-            error.message
-        );
-
-        return;
-    }
-
-
-    alert(
-        "✅ Room details saved!"
-    );
-
-
-    await loadMatches();
+showTab(name,btn);
 
 }
 
 
-/* =========================
-   LOAD TRANSACTIONS
-========================= */
+/* ==============================
+   ADMIN LOGIN
+============================== */
 
-async function loadTransactions(){
+async function adminLogin(){
 
-    const box =
-        document.getElementById(
-            "transactions"
-        );
+msg(
+"loginMsg",
+"Logging in..."
+);
 
+const email =
+document
+.getElementById("loginEmail")
+.value
+.trim();
 
-    box.innerHTML =
-        "Loading entries...";
-
-
-    const {
-        data,
-        error
-    } =
-    await supabase
-    .from("Transactions")
-    .select(
-        'id,Phone,Amount,Type,Status,"Payment id",Payment,User_id,Match_id'
-    )
-    .order(
-        "id",
-        { ascending:false }
-    );
+const password =
+document
+.getElementById("loginPassword")
+.value;
 
 
-    if(error){
+if(!email || !password){
 
-        box.innerHTML =
-        `<p class="error">
-        ❌ ${escapeHTML(error.message)}
-        </p>`;
+msg(
+"loginMsg",
+"Email and password required."
+);
 
-        return;
-    }
-
-
-    if(!data || data.length === 0){
-
-        box.innerHTML =
-        "<p>No payment entries.</p>";
-
-        return;
-    }
-
-
-    box.innerHTML = "";
-
-
-    data.forEach(function(t){
-
-        const div =
-            document.createElement("div");
-
-        div.className =
-            "entry";
-
-
-        div.innerHTML = `
-
-            <p>
-                <b>Entry ID:</b>
-                ${t.id}
-            </p>
-
-            <p>
-                📱 <b>Phone:</b>
-                ${escapeHTML(t.Phone || "-")}
-            </p>
-
-            <p>
-                💰 <b>Amount:</b>
-                ₹${t.Amount || 0}
-            </p>
-
-            <p>
-                🧾 <b>Payment ID:</b>
-                ${escapeHTML(t["Payment id"] || "-")}
-            </p>
-
-            <p>
-                🎮 <b>Match ID:</b>
-                ${t.Match_id || "-"}
-            </p>
-
-            <p>
-                <span class="status">
-                    ${escapeHTML(t.Status || "-")}
-                </span>
-            </p>
-
-            ${
-                t.Status !== "Approved"
-                ?
-                `
-                <button
-                    class="approve"
-                    onclick="approveEntry(${t.id}, ${t.Match_id})"
-                >
-                    ✅ APPROVE
-                </button>
-
-                <button
-                    class="reject"
-                    onclick="rejectEntry(${t.id})"
-                >
-                    ❌ REJECT
-                </button>
-                `
-                :
-                `
-                <p class="success">
-                    ✅ Already Approved
-                </p>
-                `
-            }
-
-        `;
-
-
-        box.appendChild(div);
-
-    });
+return;
 
 }
 
 
-/* =========================
-   APPROVE ENTRY
-========================= */
-
-async function approveEntry(
-    transactionId,
-    matchId
+if(
+email.toLowerCase()
+!== ADMIN_EMAIL.toLowerCase()
 ){
 
-    if(!matchId){
+msg(
+"loginMsg",
+"❌ This email is not an admin."
+);
 
-        alert(
-            "Match ID missing."
-        );
-
-        return;
-    }
-
-
-    const roomInput =
-        document.getElementById(
-            `room_match_${matchId}`
-        );
-
-
-    const passInput =
-        document.getElementById(
-            `pass_match_${matchId}`
-        );
-
-
-    if(!roomInput || !passInput){
-
-        alert(
-            "Please set Room ID and Password in the tournament section first."
-        );
-
-        return;
-    }
-
-
-    const room =
-        roomInput.value.trim();
-
-    const pass =
-        passInput.value.trim();
-
-
-    if(!room || !pass){
-
-        alert(
-            "Room ID and Room Password required."
-        );
-
-        return;
-    }
-
-
-    /* SAVE ROOM */
-
-    const {
-        error: roomError
-    } =
-    await supabase
-    .from("Matches")
-    .update({
-
-        "Room id": room,
-        "Room pass": pass
-
-    })
-    .eq(
-        "id",
-        matchId
-    );
-
-
-    if(roomError){
-
-        alert(
-            roomError.message
-        );
-
-        return;
-    }
-
-
-    /* APPROVE PAYMENT */
-
-    const {
-        error
-    } =
-    await supabase
-    .from("Transactions")
-    .update({
-
-        Status: "Approved"
-
-    })
-    .eq(
-        "id",
-        transactionId
-    );
-
-
-    if(error){
-
-        alert(
-            error.message
-        );
-
-        return;
-    }
-
-
-    alert(
-        "✅ Payment approved!"
-    );
-
-
-    await loadTransactions();
+return;
 
 }
 
 
-/* =========================
-   REJECT ENTRY
-========================= */
+const {data,error} =
+await sb.auth.signInWithPassword({
 
-async function rejectEntry(id){
+email:email,
+password:password
 
-    if(
-        !confirm(
-            "Reject this payment?"
-        )
-    ){
-
-        return;
-    }
+});
 
 
-    const { error } =
-    await supabase
-    .from("Transactions")
-    .update({
+if(error){
 
-        Status: "Rejected"
+msg(
+"loginMsg",
+"❌ " + error.message
+);
 
-    })
-    .eq(
-        "id",
-        id
-    );
-
-
-    if(error){
-
-        alert(
-            error.message
-        );
-
-        return;
-    }
-
-
-    alert(
-        "❌ Payment rejected."
-    );
-
-
-    await loadTransactions();
+return;
 
 }
 
 
-/* =========================
+if(
+(data.user.email || "")
+.toLowerCase()
+!== ADMIN_EMAIL.toLowerCase()
+){
+
+await sb.auth.signOut();
+
+msg(
+"loginMsg",
+"❌ Admin access denied."
+);
+
+return;
+
+}
+
+
+currentUser =
+data.user;
+
+await openAdmin();
+
+}
+
+
+/* ==============================
+   OPEN ADMIN
+============================== */
+
+async function openAdmin(){
+
+document
+.getElementById("login")
+.style.display="none";
+
+document
+.getElementById("app")
+.style.display="block";
+
+document
+.getElementById("who")
+.textContent =
+currentUser?.email || ADMIN_EMAIL;
+
+await refreshAll();
+
+}
+
+
+/* ==============================
    LOGOUT
-========================= */
+============================== */
 
 async function logout(){
 
-    await supabase.auth.signOut();
+await sb.auth.signOut();
 
-    location.reload();
-
-}
-
-
-/* =========================
-   HOME
-========================= */
-
-function goHome(){
-
-    location.href =
-        "index.html";
+location.reload();
 
 }
 
 
-/* =========================
-   ESCAPE HTML
-========================= */
+/* ==============================
+   REFRESH
+============================== */
 
-function escapeHTML(value){
+async function refreshAll(){
 
-    return String(
-        value ?? ""
-    )
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+msg(
+"dashMsg",
+"Refreshing..."
+);
+
+await Promise.allSettled([
+
+loadPlayers(),
+loadTournaments(),
+loadPayments(),
+loadResults(),
+loadWallets(),
+loadNotifications(),
+loadActivities()
+
+]);
+
+updateStats();
+
+renderAll();
+
+msg(
+"dashMsg",
+"Updated."
+);
 
 }
 
 
-/* =========================
-   START
-========================= */
+/* ==============================
+   LOAD PLAYERS
+============================== */
 
-checkAdmin();
+async function loadPlayers(){
 
-</script>
+const {data,error} =
+await sb
+.from("User_Data")
+.select("*")
+.order("id",{ascending:false});
 
-</body>
-</html>
+
+if(error){
+
+console.warn(error);
+
+players=[];
+
+return;
+
+}
+
+
+players =
+data || [];
+
+}
+
+
+/* ==============================
+   LOAD TOURNAMENTS
+============================== */
+
+async function loadTournaments(){
+
+const {data,error} =
+await sb
+.from("Matches")
+.select("*")
+.order("id",{ascending:false});
+
+
+if(error){
+
+console.warn(error);
+
+tournaments=[];
+
+return;
+
+}
+
+
+tournaments =
+data || [];
+
+}
+
+
+/* ==============================
+   LOAD PAYMENTS
+============================== */
+
+async function loadPayments(){
+
+const {data,error} =
+await sb
+.from("Transactions")
+.select("*")
+.order("id",{ascending:false});
+
+
+if(error){
+
+console.warn(error);
+
+payments=[];
+
+return;
+
+}
+
+
+payments =
+data || [];
+
+}
+
+
+/* ==============================
+   LOAD RESULTS
+============================== */
+
+async function loadResults(){
+
+const {data,error} =
+await sb
+.from("Tournament_Results")
+.select("*")
+.order("id",{ascending:false});
+
+
+if(error){
+
+console.warn(
+"Results table:",
+error.message
+);
+
+results=[];
+
+return;
+
+}
+
+
+results =
+data || [];
+
+}
+
+
+/* ==============================
+   LOAD WALLET
+============================== */
+
+async function loadWallets(){
+
+const {data,error} =
+await sb
+.from("Wallet_Transactions")
+.select("*")
+.order("id",{ascending:false});
+
+
+if(error){
+
+console.warn(
+"Wallet table:",
+error.message
+);
+
+wallets=[];
+
+return;
+
+}
+
+
+wallets =
+data || [];
+
+}
+
+
+/* ==============================
+   LOAD NOTIFICATIONS
+============================== */
+
+async function loadNotifications(){
+
+const {data,error} =
+await sb
+.from("Notifications")
+.select("*")
+.order("id",{ascending:false});
+
+
+if(error){
+
+console.warn(
+"Notifications table:",
+error.message
+);
+
+notifications=[];
+
+return;
+
+}
+
+
+notifications =
+data || [];
+
+}
+
+
+/* ==============================
+   LOAD ACTIVITY
+============================== */
+
+async function loadActivities(){
+
+const {data,error} =
+await sb
+.from("Admin_Activity_Log")
+.select("*")
+.order("id",{ascending:false})
+.limit(200);
+
+
+if(error){
+
+console.warn(
+"Activity table:",
+error.message
+);
+
+activities=[];
+
+return;
+
+}
+
+
+activities =
+data || [];
+
+}
+
+
+/* ==============================
+   DASHBOARD STATS
+============================== */
+
+function updateStats(){
+
+document.getElementById(
+"sPlayers"
+).textContent =
+players.length;
+
+
+document.getElementById(
+"sTournaments"
+).textContent =
+tournaments.length;
+
+
+document.getElementById(
+"sPayments"
+).textContent =
+payments.length;
+
+
+const pending =
+payments.filter(x =>
+String(x.Status || "")
+.toLowerCase()
+==="pending"
+).length;
+
+
+const approved =
+payments.filter(x =>
+String(x.Status || "")
+.toLowerCase()
+==="approved"
+);
+
+
+const rejected =
+payments.filter(x =>
+String(x.Status || "")
+.toLowerCase()
+==="rejected"
+);
+
+
+document.getElementById(
+"sPending"
+).textContent =
+pending;
+
+
+document.getElementById(
+"sApproved"
+).textContent =
+approved.length;
+
+
+document.getElementById(
+"sRejected"
+).textContent =
+rejected.length;
+
+
+document.getElementById(
+"sRevenue"
+).textContent =
+"₹" +
+approved.reduce(
+(a,x)=>
+a + Number(x.Amount || 0),
+0
+);
+
+
+document.getElementById(
+"sPrize"
+).textContent =
+"₹" +
+results.reduce(
+(a,x)=>
+a + Number(
+x.prize ??
+x.Prize ??
+0
+),
+0
+);
+
+}
+
+
+/* ==============================
+   RENDER ALL
+============================== */
+
+function renderAll(){
+
+renderPlayers();
+renderTournaments();
+renderPayments();
+renderMatches();
+renderResults();
+renderWallets();
+renderNotifications();
+renderActivities();
+
+}
+
+
+/* ==============================
+   PLAYERS
+============================== */
+
+function renderPlayers(){
+
+const q =
+(
+document
+.getElementById("playerSearch")
+?.value || ""
+)
+.toLowerCase();
+
+
+const arr =
+players.filter(x =>
+
+[
+x.Username,
+x.Email,
+x["Phone 
