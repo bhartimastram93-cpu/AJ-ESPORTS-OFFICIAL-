@@ -2288,9 +2288,88 @@ window.loadEntries =
 
 console.log(
     "AJ ESPORTS OFFICIAL JS loaded successfully."
-);
+);/* =========================
+   PASSWORD RESET
+========================= */
+
+async function checkRecoverySession() {
+    if (!supabaseClient) return;
+
+    if (window.location.hash.includes("type=recovery")) {
+        const modal = document.getElementById("resetModal");
+
+        if (modal) {
+            modal.style.display = "flex";
+        }
+    }
+}
+
+function closeReset() {
+    const modal = document.getElementById("resetModal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+async function updatePassword() {
+    const password = document.getElementById("newPassword").value;
+    const confirm = document.getElementById("confirmPassword").value;
+    const msg = document.getElementById("resetMessage");
+
+    if (!password || !confirm) {
+        msg.innerText = "Password required.";
+        return;
+    }
+
+    if (password !== confirm) {
+        msg.innerText = "Passwords do not match.";
+        return;
+    }
+
+    if (password.length < 6) {
+        msg.innerText = "Password must be at least 6 characters.";
+        return;
+    }
+
+    msg.innerText = "Updating password...";
+
+    const { error } = await supabaseClient.auth.updateUser({
+        password: password
+    });
+
+    if (error) {
+        msg.innerText = "❌ " + error.message;
+        return;
+    }
+
+    msg.innerText = "✅ Password updated successfully!";
+
+    setTimeout(async function () {
+        await supabaseClient.auth.signOut();
+
+        window.location.hash = "";
+
+        window.location.reload();
+    }, 1500);
+}
 
 </script>
+   <div id="resetModal" class="modal" style="display:none;">
+  <div class="modalBox">
+    <span class="close" onclick="closeReset()">×</span>
 
+    <h2>Reset Password</h2>
+
+    <input id="newPassword" type="password" placeholder="New Password">
+
+    <input id="confirmPassword" type="password" placeholder="Confirm Password">
+
+    <button onclick="updatePassword()">UPDATE PASSWORD</button>
+
+    <p id="resetMessage"></p>
+  </div>
+</div>
+   
 </body>
 </html>
