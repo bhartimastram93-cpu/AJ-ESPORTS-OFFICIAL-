@@ -2376,6 +2376,597 @@ async function updatePassword() {
     <p id="resetMessage"></p>
   </div>
 </div>
-   
+   <!-- ================= AJ ESPORTS REGISTRATION ================= -->
+
+<style>
+.aj-reg-box{
+  background:#0b0b0b;
+  border:1px solid #8b1111;
+  border-radius:15px;
+  padding:20px;
+  margin:25px auto;
+  max-width:600px;
+  color:#fff;
+  box-shadow:0 0 18px rgba(255,0,0,.18);
+}
+
+.aj-reg-box h2{
+  text-align:center;
+  color:#ff3030;
+  margin-bottom:18px;
+}
+
+.aj-reg-box label{
+  display:block;
+  margin:12px 0 6px;
+  color:#ffbaba;
+  font-weight:bold;
+}
+
+.aj-reg-box input,
+.aj-reg-box select{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #662020;
+  background:#171717;
+  color:white;
+  font-size:15px;
+}
+
+.aj-player{
+  border:1px solid #402020;
+  border-radius:10px;
+  padding:12px;
+  margin-top:12px;
+}
+
+.aj-player h4{
+  color:#ffd700;
+  margin-bottom:8px;
+}
+
+.aj-reg-btn{
+  width:100%;
+  border:0;
+  border-radius:9px;
+  padding:14px;
+  margin-top:18px;
+  background:linear-gradient(90deg,#e00000,#780000);
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+}
+
+.aj-reg-msg{
+  text-align:center;
+  margin-top:12px;
+  line-height:1.5;
+}
+
+.aj-success{color:#35e28b}
+.aj-error{color:#ff6677}
+</style>
+
+
+<div class="aj-reg-box">
+
+  <h2>📝 JOIN TOURNAMENT</h2>
+
+  <label>Select Tournament</label>
+  <select id="ajMatch">
+    <option value="">-- Select Tournament --</option>
+  </select>
+
+  <label>Game Mode</label>
+  <select id="ajMode">
+    <option value="">-- Select Mode --</option>
+    <option value="Solo">🎯 Solo</option>
+    <option value="Duo">👥 Duo</option>
+    <option value="Squad">🏆 Squad</option>
+  </select>
+
+  <div id="ajTeamBox"></div>
+
+  <div id="ajPlayers"></div>
+
+  <label>📱 Captain Phone Number</label>
+  <input
+    id="ajPhone"
+    type="tel"
+    inputmode="numeric"
+    maxlength="10"
+    placeholder="10 digit mobile number">
+
+  <label>💳 UTR / Transaction ID</label>
+  <input
+    id="ajUTR"
+    placeholder="Payment ke baad UTR number">
+
+  <p id="ajFee"
+     style="text-align:center;color:#ffd700;margin-top:15px">
+  </p>
+
+  <button
+    type="button"
+    class="aj-reg-btn"
+    id="ajSubmit">
+    🚀 SUBMIT REGISTRATION
+  </button>
+
+  <div id="ajRegMsg" class="aj-reg-msg"></div>
+
+</div>
+
+
+<script>
+(function(){
+
+  /*
+    IMPORTANT:
+    Neeche apni existing Supabase ANON/PUBLISHABLE KEY paste karo.
+    Service Role key MAT paste karna.
+  */
+
+  const AJ_SUPABASE_URL =
+    "https://otjwqfxvaxfgjibwtlkq.supabase.co";
+
+  const AJ_SUPABASE_ANON_KEY =
+    "PASTE_YOUR_EXISTING_ANON_KEY_HERE";
+
+  const AJ_SB =
+    window.supabase.createClient(
+      AJ_SUPABASE_URL,
+      AJ_SUPABASE_ANON_KEY
+    );
+
+
+  let ajTournaments = [];
+
+
+  function aj(id){
+    return document.getElementById(id);
+  }
+
+
+  function ajMessage(text,success=false){
+
+    aj("ajRegMsg").textContent=text;
+
+    aj("ajRegMsg").className =
+      "aj-reg-msg " +
+      (success ? "aj-success" : "aj-error");
+  }
+
+
+  function ajPlayerCount(mode){
+
+    if(mode === "Solo") return 1;
+    if(mode === "Duo") return 2;
+    if(mode === "Squad") return 4;
+
+    return 0;
+  }
+
+
+  function ajSelectedTournament(){
+
+    return ajTournaments.find(
+      t => String(t.id) === String(aj("ajMatch").value)
+    );
+  }
+
+
+  async function ajLoadTournaments(){
+
+    const result =
+      await AJ_SB
+      .from("Matches")
+      .select("*")
+      .order("id",{ascending:false});
+
+    if(result.error){
+
+      ajMessage(
+        "Tournament load nahi hua: " +
+        result.error.message
+      );
+
+      return;
+    }
+
+    ajTournaments =
+      (result.data || []).filter(
+        t =>
+          String(t.Status || "").toLowerCase()
+          !== "closed"
+      );
+
+
+    aj("ajMatch").innerHTML =
+      '<option value="">-- Select Tournament --</option>' +
+
+      ajTournaments.map(t => {
+
+        const fee =
+          Number(t["Entry fee"] || 0);
+
+        return `
+          <option value="${t.id}">
+            ${t.Title || "Tournament"} — ₹${fee}
+          </option>
+        `;
+
+      }).join("");
+  }
+
+
+  function ajUpdateFee(){
+
+    const t =
+      ajSelectedTournament();
+
+    if(!t){
+
+      aj("ajFee").textContent="";
+      return;
+    }
+
+    const fee =
+      Number(t["Entry fee"] || 0);
+
+    aj("ajFee").textContent =
+      "💰 Entry Fee: ₹" + fee;
+  }
+
+
+  function ajBuildPlayers(){
+
+    const mode =
+      aj("ajMode").value;
+
+    const teamBox =
+      aj("ajTeamBox");
+
+    const players =
+      aj("ajPlayers");
+
+    teamBox.innerHTML="";
+    players.innerHTML="";
+
+    if(!mode) return;
+
+
+    if(mode !== "Solo"){
+
+      teamBox.innerHTML=`
+        <label>
+          ${mode === "Duo"
+            ? "👥 Duo / Team Name"
+            : "🏆 Squad Name"}
+        </label>
+
+        <input
+          id="ajTeamName"
+          placeholder="${
+            mode === "Duo"
+            ? "Enter Duo Name"
+            : "Enter Squad Name"
+          }">
+      `;
+    }
+
+
+    const count =
+      ajPlayerCount(mode);
+
+
+    for(let i=1;i<=count;i++){
+
+      players.innerHTML += `
+
+        <div class="aj-player">
+
+          <h4>
+            ${i === 1
+              ? "👑 Captain"
+              : "👤 Player " + i}
+          </h4>
+
+          <label>Free Fire Username</label>
+
+          <input
+            id="ajUsername${i}"
+            placeholder="FF Username">
+
+        </div>
+      `;
+    }
+
+  }
+
+
+  async function ajSubmit(){
+
+    const t =
+      ajSelectedTournament();
+
+    const mode =
+      aj("ajMode").value;
+
+    const phone =
+      aj("ajPhone").value.trim();
+
+    const utr =
+      aj("ajUTR").value.trim();
+
+
+    if(!t){
+
+      ajMessage(
+        "Pehle tournament select karo."
+      );
+
+      return;
+    }
+
+
+    if(!mode){
+
+      ajMessage(
+        "Solo, Duo ya Squad select karo."
+      );
+
+      return;
+    }
+
+
+    if(!/^[0-9]{10}$/.test(phone)){
+
+      ajMessage(
+        "Valid 10 digit phone number daalo."
+      );
+
+      return;
+    }
+
+
+    if(!utr){
+
+      ajMessage(
+        "UTR / Transaction ID daalo."
+      );
+
+      return;
+    }
+
+
+    const count =
+      ajPlayerCount(mode);
+
+    const usernames=[];
+
+
+    for(let i=1;i<=count;i++){
+
+      const input =
+        aj("ajUsername"+i);
+
+      const username =
+        input.value.trim();
+
+
+      if(!username){
+
+        ajMessage(
+          "Player " + i +
+          " ka FF Username daalo."
+        );
+
+        return;
+      }
+
+      usernames.push(username);
+    }
+
+
+    let teamName=null;
+
+
+    if(mode !== "Solo"){
+
+      teamName =
+        aj("ajTeamName")
+        .value.trim();
+
+
+      if(!teamName){
+
+        ajMessage(
+          "Team/Squad name daalo."
+        );
+
+        return;
+      }
+    }
+
+
+    ajMessage(
+      "Registration submit ho rahi hai...",
+      true
+    );
+
+
+    const sessionResult =
+      await AJ_SB.auth.getSession();
+
+
+    if(
+      sessionResult.error ||
+      !sessionResult.data.session
+    ){
+
+      ajMessage(
+        "Pehle login karo."
+      );
+
+      return;
+    }
+
+
+    const email =
+      sessionResult
+      .data
+      .session
+      .user
+      .email;
+
+
+    const userResult =
+      await AJ_SB
+      .from("User_Data")
+      .select('id, "banned"')
+      .ilike("Email",email)
+      .maybeSingle();
+
+
+    if(userResult.error){
+
+      ajMessage(
+        "Profile load error: " +
+        userResult.error.message
+      );
+
+      return;
+    }
+
+
+    if(!userResult.data){
+
+      ajMessage(
+        "Profile not found."
+      );
+
+      return;
+    }
+
+
+    if(userResult.data.banned){
+
+      ajMessage(
+        "Your account is banned."
+      );
+
+      return;
+    }
+
+
+    const fee =
+      Number(t["Entry fee"] || 0);
+
+
+    const registration = {
+
+      match_id:Number(t.id),
+
+      user_id:Number(
+        userResult.data.id
+      ),
+
+      mode:mode,
+
+      team_name:teamName,
+
+      player1_username:
+        usernames[0] || null,
+
+      player2_username:
+        usernames[1] || null,
+
+      player3_username:
+        usernames[2] || null,
+
+      player4_username:
+        usernames[3] || null,
+
+      phone:phone,
+
+      amount:fee,
+
+      payment_id:utr,
+
+      status:"Pending"
+    };
+
+
+    const insertResult =
+      await AJ_SB
+      .from("Tournament_Registrations")
+      .insert(registration);
+
+
+    if(insertResult.error){
+
+      ajMessage(
+        "❌ Registration failed: " +
+        insertResult.error.message
+      );
+
+      return;
+    }
+
+
+    ajMessage(
+      "✅ Registration submitted! Admin approval ka wait karo.",
+      true
+    );
+
+
+    aj("ajUTR").value="";
+
+  }
+
+
+  aj("ajMode")
+    .addEventListener(
+      "change",
+      ajBuildPlayers
+    );
+
+
+  aj("ajMatch")
+    .addEventListener(
+      "change",
+      ajUpdateFee
+    );
+
+
+  aj("ajSubmit")
+    .addEventListener(
+      "click",
+      ajSubmit
+    );
+
+
+  if(
+    AJ_SUPABASE_ANON_KEY.includes(
+      "PASTE_YOUR"
+    )
+  ){
+
+    ajMessage(
+      "⚠️ Existing Supabase ANON key is code mein paste karo."
+    );
+
+    return;
+  }
+
+
+  ajLoadTournaments();
+
+})();
+</script>
+
+<!-- ================= END REGISTRATION ================= -->
 </body>
 </html>
