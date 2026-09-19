@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AJ ESPORTS OFFICIAL — Admin V3</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#070b16;color:#fff;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.loginbox,.card{background:#101729;border:1px solid #26334d;border-radius:18px;box-shadow:0 15px 45px #0007}
+.loginbox{width:min(430px,100%);padding:28px}
+.logo{text-align:center;font-size:27px;font-weight:900;color:#6ee7ff;margin-bottom:7px}
+.sub{text-align:center;color:#9aa8c2;margin-bottom:24px}
+input,select,textarea{width:100%;background:#0a1020;color:#fff;border:1px solid #2b3855;border-radius:10px;padding:12px;margin:7px 0;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#55d8ff}
+textarea{min-height:90px;resize:vertical}
+button.primary{background:#18b6f2;color:#00131b;padding:12px 16px;border-radius:10px;font-weight:800}
+button.success{background:#16a34a;color:#fff;padding:9px 12px;border-radius:9px}
+button.danger{background:#ef4444;color:#fff;padding:9px 12px;border-radius:9px}
+button.warn{background:#eab308;color:#111;padding:9px 12px;border-radius:9px}
+button.secondary{background:#26334d;color:#fff;padding:9px 12px;border-radius:9px}
+.msg{margin-top:10px;color:#6ee7ff;min-height:20px}
+#app{display:none}
+header{position:sticky;top:0;z-index:5;background:#0a1020ee;backdrop-filter:blur(12px);border-bottom:1px solid #202b43;padding:14px 18px}
+.head{max-width:1450px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.brand{font-weight:900;font-size:20px}.adminmail{font-size:12px;color:#8fa0bc;margin-top:4px}
+.wrap{max-width:1450px;margin:auto;padding:18px}
+.tabs{display:flex;gap:8px;overflow:auto;padding-bottom:12px}
+.tab{white-space:nowrap;background:#131d32;color:#b9c6dd;padding:11px 14px;border-radius:10px}
+.tab.active{background:#18b6f2;color:#00131b;font-weight:800}
+.panel{display:none}.panel.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.card{padding:18px;margin-bottom:16px}
+.stat small{color:#8fa0bc}.stat b{display:block;font-size:28px;margin-top:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{padding:10px;border-bottom:1px solid #25304a;text-align:left;font-size:13px;vertical-align:top}
+th{color:#8fa0bc;background:#0d1424}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:800}
+.pending{background:#493d0a;color:#ffe68a}.approved{background:#073d20;color:#72f5a8}.rejected{background:#4a1218;color:#ff9aa5}
+.muted{color:#8fa0bc}.search{max-width:450px}
+.kpi{font-size:12px;color:#8fa0bc;margin-top:6px}
+footer{text-align:center;color:#66748d;padding:25px}
+.hidden{display:none!important}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.row3{grid-template-columns:1fr}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.wrap{padding:12px}.card{padding:14px}.head{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+
+<section id="login">
+<div class="loginbox">
+<div class="logo">AJ ESPORTS OFFICIAL</div>
+<div class="sub">Secure Admin Panel</div>
+<input id="loginEmail" type="email" autocomplete="username" placeholder="Admin email">
+<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
+<button type="button" class="primary" style="width:100%;margin-top:8px" id="loginButton">LOGIN</button>
+<div id="loginMsg" class="msg"></div>
+</div>
+</section>
+
+<div id="app">
+<header>
+<div class="head">
+<div><div class="brand">🎮 AJ ESPORTS OFFICIAL</div><div class="adminmail" id="who"></div></div>
+<button type="button" class="danger" id="logoutButton">Logout</button>
+</div>
+</header>
+
+<main class="wrap">
+<div class="tabs">
+<button class="tab active" data-tab="dashboard">📊 Dashboard</button>
+<button class="tab" data-tab="tournaments">🏆 Tournaments</button>
+<button class="tab" data-tab="players">👥 Players</button>
+<button class="tab" data-tab="payments">💳 Payments</button>
+<button class="tab" data-tab="matches">🎮 Matches</button>
+<button class="tab" data-tab="results">🏅 Results</button>
+<button class="tab" data-tab="wallet">💰 Wallet</button>
+<button class="tab" data-tab="notifications">🔔 Notifications</button>
+<button class="tab" data-tab="activity">📝 Activity</button>
+<button class="tab" data-tab="settings">⚙️ Settings</button>
+</div>
+
+<section id="dashboard" class="panel active">
+<div class="grid">
+<div class="card stat"><small>Total Players</small><b id="sPlayers">0</b></div>
+<div class="card stat"><small>Tournaments</small><b id="sTournaments">0</b></div>
+<div class="card stat"><small>Payments</small><b id="sPayments">0</b></div>
+<div class="card stat"><small>Pending</small><b id="sPending">0</b></div>
+<div class="card stat"><small>Approved</small><b id="sApproved">0</b></div>
+<div class="card stat"><small>Rejected</small><b id="sRejected">0</b></div>
+<div class="card stat"><small>Entry Revenue</small><b id="sRevenue">₹0</b></div>
+<div class="card stat"><small>Prize Total</small><b id="sPrize">₹0</b></div>
+</div>
+<div class="card">
+<h2>Quick Actions</h2>
+<div class="actions">
+<button type="button" class="primary" data-quick="tournaments">+ New Tournament</button>
+<button type="button" class="warn" data-quick="payments">Review Payments</button>
+<button type="button" class="secondary" id="refreshButton">🔄 Refresh Everything</button>
+</div>
+<div id="dashMsg" class="msg"></div>
+</div>
+</section>
+
+<section id="tournaments" class="panel">
+<div class="card">
+<h2>🏆 Create Tournament</h2>
+<div class="row">
+<input id="tTitle" placeholder="Tournament title">
+<input id="tFee" type="number" min="0" placeholder="Entry fee">
+<input id="tKill" type="number" min="0" placeholder="Per kill">
+<input id="tPrize" type="number" min="0" placeholder="Prize pool">
+<input id="tDate" type="date">
+<input id="tTime" type="time">
+<input id="tMap" placeholder="Map / Mode e.g. Bermuda / 1v1">
+<input id="tSlots" type="number" min="1" placeholder="Maximum slots">
+</div>
+<select id="tStatus"><option>Open</option><option>Closed</option><option>Live</option><option>Completed</option></select>
+<textarea id="tRules" placeholder="Rules / notes"></textarea>
+<button type="button" class="primary" id="createTournamentButton">CREATE TOURNAMENT</button>
+<div id="tMsg" class="msg"></div>
+</div>
+<div class="card">
+<h2>Manage Tournaments</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Title</th><th>Fee</th><th>Kill</th><th>Prize</th><th>Status</th><th>Date/Time</th><th>Room</th><th>Actions</th></tr></thead><tbody id="tournamentsBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="players" class="panel">
+<div class="card">
+<h2>👥 Players</h2>
+<input class="search" id="playerSearch" placeholder="Search username, email, phone or FF ID">
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>FF ID</th><th>Wallet</th><th>Status</th><th>Actions</th></tr></thead><tbody id="playersBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="payments" class="panel">
+<div class="card">
+<h2>💳 Payment Verification</h2>
+<select id="payFilter"><option value="">All</option><option>Pending</option><option>Approved</option><option>Rejected</option></select>
+<input class="search" id="paySearch" placeholder="Search UTR / phone / match ID">
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Player</th><th>Phone</th><th>Amount</th><th>UTR</th><th>Match</th><th>Status</th><th>Action</th></tr></thead><tbody id="paymentsBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="matches" class="panel">
+<div class="card">
+<h2>🎮 Room & Match Control</h2>
+<div class="tablewrap"><table><thead><tr><th>Match</th><th>Title</th><th>Status</th><th>Room ID</th><th>Room Pass</th><th>Save</th></tr></thead><tbody id="matchesBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="results" class="panel">
+<div class="card">
+<h2>🏅 Add / Update Result</h2>
+<div class="row3">
+<input id="rMatch" type="number" placeholder="Match ID">
+<input id="rUser" type="number" placeholder="Player User ID">
+<input id="rRank" type="number" placeholder="Rank">
+<input id="rKills" type="number" placeholder="Kills">
+<input id="rPrize" type="number" placeholder="Prize">
+<input id="rNote" placeholder="Result note">
+</div>
+<div style="margin-top:8px"><button type="button" class="primary" id="saveResultButton">SAVE RESULT</button></div>
+<div id="rMsg" class="msg"></div>
+</div>
+<div class="card">
+<h2>Published Results</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Match</th><th>User</th><th>Rank</th><th>Kills</th><th>Prize</th><th>Published</th><th>Action</th></tr></thead><tbody id="resultsBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="wallet" class="panel">
+<div class="card">
+<h2>💰 Wallet Adjustment</h2>
+<div class="row">
+<input id="wUser" type="number" placeholder="Player User ID">
+<input id="wAmount" type="number" placeholder="Amount (+ credit / - debit)">
+</div>
+<input id="wReason" placeholder="Reason">
+<button type="button" class="primary" id="walletButton">UPDATE WALLET</button>
+<div id="wMsg" class="msg"></div>
+</div>
+<div class="card">
+<h2>Wallet Transactions</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Reason</th><th>Created</th></tr></thead><tbody id="walletBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="notifications" class="panel">
+<div class="card">
+<h2>🔔 Send Notification</h2>
+<div class="row"><input id="nUser" type="number" placeholder="Player User ID (blank = all)"><input id="nTitle" placeholder="Notification title"></div>
+<textarea id="nMessage" placeholder="Message"></textarea>
+<button type="button" class="primary" id="notificationButton">SEND NOTIFICATION</button>
+<div id="nMsg" class="msg"></div>
+</div>
+<div class="card">
+<h2>Notification History</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>User</th><th>Title</th><th>Message</th><th>Created</th></tr></thead><tbody id="notificationsBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="activity" class="panel">
+<div class="card">
+<h2>📝 Activity Log</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Admin</th><th>Action</th><th>Details</th><th>Time</th></tr></thead><tbody id="activityBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="settings" class="panel">
+<div class="card">
+<h2>⚙️ Admin Settings</h2>
+<p class="muted">Admin email</p><input value="bhartiamarjeet619@gmail.com" readonly>
+<p class="muted" style="margin-top:10px">Tournament UPI</p><input value="ajesportsofficial@ibl" readonly>
+<p class="muted" style="margin-top:12px">Security</p>
+<div class="kpi">Only the configured admin email can open this dashboard. Database permissions are still controlled by Supabase RLS.</div>
+</div>
+</section>
+
+<footer>AJ ESPORTS OFFICIAL • Secure Admin Panel</footer>
+</main>
+</div>
+
+<script>
+"use strict";
+
+/* ================= CONFIG ================= */
+const SUPABASE_URL="https://otjwqfxvaxfgjibwtlkq.supabase.co";
+const SUPABASE_ANON_KEY="PASTE_YOUR_EXISTING_SUPABASE_ANON_KEY_HERE";
+const ADMIN_EMAIL="bhartiamarjeet619@gmail.com";
+
+let sb=null,currentUser=null;
+let players=[],tournaments=[],payments=[],results=[],wallets=[],notifications=[],activities=[];
+
+/* ================= HELPERS ================= */
+const $=id=>document.getElementById(id);
+function setMsg(id,text){const e=$(id);if(e)e.textContent=text}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function badge(v){
+ const s=String(v||"Unknown"),l=s.toLowerCase();
+ const c=(l==="approved"||l==="open"||l==="live")?"approved":(l==="rejected"||l==="closed")?"rejected":"pending";
+ return '<span class="badge '+c+'">'+esc(s)+'</span>';
+}
+function errText(e){return e?.message||String(e||"Unknown error")}
+function num(v){return Number(v||0)}
+function findPlayer(id){return players.find(p=>String(p.id)===String(id))}
+function findTournament(id){return tournaments.find(t=>String(t.id)===String(id))}
+
+/* ================= SUPABASE ================= */
+function initSupabase(){
+ if(!window.supabase){
+   setMsg("loginMsg","❌ Supabase library failed to load.");
+   return false;
+ }
+ if(!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE_YOUR")){
+   setMsg("loginMsg","❌ Paste your existing Supabase anon/publishable key in this file.");
+   return false;
+ }
+ try{
+   sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+   return true;
+ }catch(e){
+   setMsg("loginMsg","❌ Supabase setup error: "+errText(e));
+   return false;
+ }
+}
+
+/* ================= TABS ================= */
+function showTab(name){
+ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+ document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+ const p=$(name),b=document.querySelector('.tab[data-tab="'+name+'"]');
+ if(p)p.classList.add("active");
+ if(b)b.classList.add("active");
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+document.querySelectorAll("[data-quick]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.quick)));
+
+/* ================= LOGIN ================= */
+async function adminLogin(){
+ setMsg("loginMsg","Checking...");
+ if(!initSupabase())return;
+
+ const email=($("loginEmail").value||"").trim();
+ const password=$("loginPassword").value||"";
+
+ if(!email||!password){setMsg("loginMsg","Email and password required.");return}
+ if(email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+   setMsg("loginMsg","❌ This email is not authorized as admin.");
+   return;
+ }
+
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){setMsg("loginMsg","❌ "+errText(error));return}
+
+ if(!data?.user || (data.user.email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+   await sb.auth.signOut();
+   setMsg("loginMsg","❌ Admin access denied.");
+   return;
+ }
+
+ currentUser=data.user;
+ await openAdmin();
+}
+async function openAdmin(){
+ $("login").style.display="none";
+ $("app").style.display="block";
+ $("who").textContent=currentUser?.email||ADMIN_EMAIL;
+ await refreshAll();
+}
+async function logout(){
+ if(sb)await sb.auth.signOut();
+ currentUser=null;
+ $("app").style.display="none";
+ $("login").style.display="grid";
+ $("loginPassword").value="";
+ setMsg("loginMsg","Logged out.");
+}
+
+/* ================= DATA LOAD ================= */
+async function loadPlayers(){
+ const {data,error}=await sb.from("User_Data").select("*").order("id",{ascending:false});
+ if(error){console.warn(error);players=[];return}
+ players=data||[];
+}
+async function loadTournaments(){
+ const {data,error}=await sb.from("Matches").select("*").order("id",{ascending:false});
+ if(error){console.warn(error);tournaments=[];return}
+ tournaments=data||[];
+}
+async function loadPayments(){
+ const {data,error}=await sb.from("Transactions").select("*").order("id",{ascending:false});
+ if(error){console.warn(error);payments=[];return}
+ payments=data||[];
+}
+async function loadResults(){
+ const {data,error}=await sb.from("Tournament_Results").select("*").order("id",{ascending:false});
+ if(error){console.warn(error);results=[];return}
+ results=data||[];
+}
+async function loadWallets(){
+ const {data,error}=await sb.from("Wallet_Transactions").select("*").order("id",{ascending:false});
+ if(error){console.warn(error);wallets=[];return}
+ wallets=data||[];
+}
+async function loadNotifications(){
+ const {data,error}=await sb.from("Notifications").select("*").order("id",{ascending:false});
+ if(error){console.warn(error);notifications=[];return}
+ notifications=data||[];
+}
+async function loadActivities(){
+ const {data,error}=await sb.from("Admin_Activity_Log").select("*").order("id",{ascending:false}).limit(200);
+ if(error){console.warn(error);activities=[];return}
+ activities=data||[];
+}
+async function refreshAll(){
+ setMsg("dashMsg","Refreshing...");
+ await Promise.allSettled([loadPlayers(),loadTournaments(),loadPayments(),loadResults(),loadWallets(),loadNotifications(),loadActivities()]);
+ updateStats();renderAll();setMsg("dashMsg","Updated.");
+}
+
+/* ================= STATS ================= */
+function updateStats(){
+ $("sPlayers").textContent=players.length;
+ $("sTournaments").textContent=tournaments.length;
+ $("sPayments").textContent=payments.length;
+ $("sPending").textContent=payments.filter(x=>String(x.Status||"").toLowerCase()==="pending").length;
+ $("sApproved").textContent=payments.filter(x=>String(x.Status||"").toLowerCase()==="approved").length;
+ $("sRejected").textContent=payments.filter(x=>String(x.Status||"").toLowerCase()==="rejected").length;
+ $("sRevenue").textContent="₹"+payments.filter(x=>String(x.Status||"").toLowerCase()==="approved").reduce((a,x)=>a+num(x.Amount),0);
+ $("sPrize").textContent="₹"+results.reduce((a,x)=>a+num(x.prize??x.Prize),0);
+}
+function renderAll(){
+ renderPlayers();renderTournaments();renderPayments();renderMatches();renderResults();renderWallets();renderNotifications();renderActivities();
+}
+
+/* ================= PLAYERS ================= */
+function renderPlayers(){
+ const q=($("playerSearch").value||"").toLowerCase();
+ const arr=players.filter(p=>[
+   p.Username,p.Email,p["Phone number"],p.Phone,p.FF_ID,p.id
+ ].some(v=>String(v??"").toLowerCase().includes(q)));
+ $("playersBody").innerHTML=arr.map(p=>{
+   const banned=!!p.banned;
+   return '<tr>'+
+   '<td>'+esc(p.id)+'</td>'+
+   '<td>'+esc(p.Username)+'</td>'+
+   '<td>'+esc(p.Email)+'</td>'+
+   '<td>'+esc(p["Phone number"]??p.Phone)+'</td>'+
+   '<td>'+esc(p.FF_ID)+'</td>'+
+   '<td>₹'+num(p["Wallet balance"])+'</td>'+
+   '<td>'+badge(banned?"Banned":"Active")+'</td>'+
+   '<td><button type="button" class="'+(banned?"success":"danger")+'" data-player="'+esc(p.id)+'">'+(banned?"UNBAN":"BAN")+'</button></td>'+
+   '</tr>';
+ }).join("")||'<tr><td colspan="8" class="muted">No players found.</td></tr>';
+ document.querySelectorAll("[data-player]").forEach(b=>b.addEventListener("click",()=>toggleBan(b.dataset.player)));
+}
+async function toggleBan(id){
+ const p=findPlayer(id);if(!p)return;
+ const next=!p.banned;
+ const {error}=await sb.from("User_Data").update({banned:next}).eq("id",id);
+ if(error){alert("Could not update player: "+errText(error));return}
+ p.banned=next;renderPlayers();await logActivity(next?"BAN_PLAYER":"UNBAN_PLAYER",{user_id:id});
+}
+
+/* ================= TOURNAMENTS ================= */
+async function createTournament(){
+ setMsg("tMsg","Creating...");
+ const payload={
+   "Title":$("tTitle").value.trim(),
+   "Entry fee":num($("tFee").value),
+   "Per kill":num($("tKill").value),
+   "Prize pool":num($("tPrize").value),
+   "Status":$("tStatus").value,
+   "match_date":$("tDate").value||null,
+   "match_time":$("tTime").value||null,
+   "map_mode":$("tMap").value.trim(),
+   "max_slots":num($("tSlots").value)||null,
+   "rules":$("tRules").value.trim()
+ };
+ if(!payload.Title){setMsg("tMsg","Tournament title required.");return}
+ const {data,error}=await sb.from("Matches").insert(payload).select().single();
+ if(error){setMsg("tMsg","❌ "+errText(error));return}
+ tournaments.unshift(data);
+ renderTournaments();renderMatches();updateStats();
+ setMsg("tMsg","✅ Tournament created. ID: "+data.id);
+ ["tTitle","tFee","tKill","tPrize","tDate","tTime","tMap","tSlots","tRules"].forEach(id=>$(id).value="");
+ await logActivity("CREATE_TOURNAMENT",{match_id:data.id,title:data.Title});
+}
+function renderTournaments(){
+ $("tournamentsBody").innerHTML=tournaments.map(t=>{
+  return '<tr>'+
+  '<td>'+esc(t.id)+'</td>'+
+  '<td>'+esc(t.Title)+'</td>'+
+  '<td>₹'+num(t["Entry fee"])+'</td>'+
+  '<td>₹'+num(t["Per kill"])+'</td>'+
+  '<td>₹'+num(t["Prize pool"])+'</td>'+
+  '<td>'+badge(t.Status)+'</td>'+
+  '<td>'+esc(t.match_date||"—")+' '+esc(t.match_time||"")+'</td>'+
+  '<td>'+esc(t["Room id"]||"—")+'</td>'+
+  '<td><div class="actions"><button type="button" class="secondary" data-edit-match="'+esc(t.id)+'">Edit</button><button type="button" class="danger" data-delete-match="'+esc(t.id)+'">Delete</button></div></td>'+
+  '</tr>';
+ }).join("")||'<tr><td colspan="9" class="muted">No tournaments yet.</td></tr>';
+ document.querySelectorAll("[data-edit-match]").forEach(b=>b.addEventListener("click",()=>editTournament(b.dataset.editMatch)));
+ document.querySelectorAll("[data-delete-match]").forEach(b=>b.addEventListener("click",()=>deleteTournament(b.dataset.deleteMatch)));
+}
+async function editTournament(id){
+ const t=findTournament(id);if(!t)return;
+ const title=prompt("Tournament title:",t.Title||"");if(title===null)return;
+ const fee=prompt("Entry fee:",num(t["Entry fee"]));if(fee===null)return;
+ const status=prompt("Status (Open/Closed/Live/Completed):",t.Status||"Open");if(status===null)return;
+ const {data,error}=await sb.from("Matches").update({"Title":title,"Entry fee":num(fee),"Status":status}).eq("id",id).select().single();
+ if(error){alert("Update failed: "+errText(error));return}
+ Object.assign(t,data);renderTournaments();renderMatches();await logActivity("EDIT_TOURNAMENT",{match_id:id});
+}
+async function deleteTournament(id){
+ if(!confirm("Delete tournament #"+id+"?"))return;
+ const {error}=await sb.from("Matches").delete().eq("id",id);
+ if(error){alert("Delete failed: "+errText(error));return}
+ tournaments=tournaments.filter(x=>String(x.id)!==String(id));renderTournaments();renderMatches();updateStats();await logActivity("DELETE_TOURNAMENT",{match_id:id});
+}
+
+/* ================= MATCHES / ROOM ================= */
+function renderMatches(){
+ $("matchesBody").innerHTML=tournaments.map(t=>{
+  return '<tr><td>'+esc(t.id)+'</td><td>'+esc(t.Title)+'</td><td>'+badge(t.Status)+'</td>'+
+  '<td><input id="room-'+esc(t.id)+'" value="'+esc(t["Room id"]||"")+'" placeholder="Room ID"></td>'+
+  '<td><input id="pass-'+esc(t.id)+'" value="'+esc(t["Room pass"]||"")+'" placeholder="Room Password"></td>'+
+  '<td><button type="button" class="success" data-save-room="'+esc(t.id)+'">SAVE</button></td></tr>';
+ }).join("")||'<tr><td colspan="6" class="muted">No matches.</td></tr>';
+ document.querySelectorAll("[data-save-room]").forEach(b=>b.addEventListener("click",()=>saveRoom(b.dataset.saveRoom)));
+}
+async function saveRoom(id){
+ const room=$("room-"+id)?.value||"",pass=$("pass-"+id)?.value||"";
+ const {data,error}=await sb.from("Matches").update({"Room id":room,"Room pass":pass}).eq("id",id).select().single();
+ if(error){alert("Room save failed: "+errText(error));return}
+ const t=findTournament(id);if(t)Object.assign(t,data);
+ renderTournaments();renderMatches();await logActivity("UPDATE_ROOM",{match_id:id});
+ alert("✅ Room details saved.");
+}
+
+/* ================= PAYMENTS ================= */
+function renderPayments(){
+ const f=$("payFilter").value.toLowerCase(),q=($("paySearch").value||"").toLowerCase();
+ const arr=payments.filter(x=>{
+  const status=String(x.Status||"").toLowerCase();
+  const search=[x["Payment id"],x.Payment,x.Phone,x.Match_id,x.id].some(v=>String(v??"").toLowerCase().includes(q));
+  return (!f||status===f)&&search;
+ });
+ $("paymentsBody").innerHTML=arr.map(p=>{
+  const player=findPlayer(p.User_id);
+  const st=String(p.Status||"Pending");
+  return '<tr><td>'+esc(p.id)+'</td><td>'+esc(player?.Username||p.User_id||"—")+'</td><td>'+esc(p.Phone)+'</td><td>₹'+num(p.Amount)+'</td><td>'+esc(p["Payment id"]??p.Payment)+'</td><td>'+esc(p.Match_id)+'</td><td>'+badge(st)+'</td><td>'+
+  '<div class="actions">'+(st.toLowerCase()==="pending"?'<button type="button" class="success" data-pay-approve="'+esc(p.id)+'">APPROVE</button><button type="button" class="danger" data-pay-reject="'+esc(p.id)+'">REJECT</button>':"")+'</div></td></tr>';
+ }).join("")||'<tr><td colspan="8" class="muted">No payments found.</td></tr>';
+ document.querySelectorAll("[data-pay-approve]").forEach(b=>b.addEventListener("click",()=>approvePayment(b.dataset.payApprove)));
+ document.querySelectorAll("[data-pay-reject]").forEach(b=>b.addEventListener("click",()=>rejectPayment(b.dataset.payReject)));
+}
+async function setPayment(id,status){
+ const {data,error}=await sb.from("Transactions").update({Status:status}).eq("id",id).select().single();
+ if(error){alert("Payment update failed: "+errText(error));return}
+ const p=payments.find(x=>String(x.id)===String(id));if(p)Object.assign(p,data);
+ renderPayments();updateStats();await logActivity(status==="Approved"?"APPROVE_PAYMENT":"REJECT_PAYMENT",{transaction_id:id});
+}
+async function approvePayment(id){await setPayment(id,"Approved")}
+async function rejectPayment(id){await setPayment(id,"Rejected")}
+
+/* ================= RESULTS ================= */
+async function saveResult(){
+ setMsg("rMsg","Saving...");
+ const match=num($("rMatch").value),user=num($("rUser").value);
+ if(!match||!user){setMsg("rMsg","Match ID and User ID required.");return}
+ const payload={match_id:match,user_id:user,rank:num($("rRank").value),kills:num($("rKills").value),prize:num($("rPrize").value),note:$("rNote").value.trim(),published:true};
+ const {data,error}=await sb.from("Tournament_Results").upsert(payload,{onConflict:"match_id,user_id"}).select().single();
+ if(error){setMsg("rMsg","❌ "+errText(error));return}
+ const idx=results.findIndex(x=>String(x.id)===String(data.id));if(idx>=0)results[idx]=data;else results.unshift(data);
+ renderResults();updateStats();setMsg("rMsg","✅ Result saved.");await logActivity("SAVE_RESULT",{match_id:match,user_id:user});
+}
+function renderResults(){
+ $("resultsBody").innerHTML=results.map(r=>'<tr><td>'+esc(r.id)+'</td><td>'+esc(r.match_id)+'</td><td>'+esc(r.user_id)+'</td><td>'+esc(r.rank)+'</td><td>'+esc(r.kills)+'</td><td>₹'+num(r.prize??r.Prize)+'</td><td>'+badge(r.published?"Published":"Hidden")+'</td><td><button type="button" class="danger" data-delete-result="'+esc(r.id)+'">Delete</button></td></tr>').join("")||'<tr><td colspan="8" class="muted">No results.</td></tr>';
+ document.querySelectorAll("[data-delete-result]").forEach(b=>b.addEventListener("click",()=>deleteResult(b.dataset.deleteResult)));
+}
+async function deleteResult(id){
+ if(!confirm("Delete this result?"))return;
+ const {error}=await sb.from("Tournament_Results").delete().eq("id",id);
+ if(error){alert("Delete failed: "+errText(error));return}
+ results=results.filter(x=>String(x.id)!==String(id));renderResults();updateStats();await logActivity("DELETE_RESULT",{result_id:id});
+}
+
+/* ================= WALLET ================= */
+async function adjustWallet(){
+ setMsg("wMsg","Updating...");
+ const uid=num($("wUser").value),amount=Number($("wAmount").value),reason=$("wReason").value.trim();
+ if(!uid||!Number.isFinite(amount)||amount===0){setMsg("wMsg","Valid User ID and non-zero amount required.");return}
+ const p=findPlayer(uid);if(!p){setMsg("wMsg","Player not found.");return}
+ const current=num(p["Wallet balance"]),next=current+amount;
+ if(next<0){setMsg("wMsg","❌ Wallet cannot go below ₹0.");return}
+ const {error:uErr}=await sb.from("User_Data").update({"Wallet balance":next}).eq("id",uid);
+ if(uErr){setMsg("wMsg","❌ "+errText(uErr));return}
+ const {data,error}=await sb.from("Wallet_Transactions").insert({user_id:uid,amount:amount,reason:reason||"Admin adjustment"}).select().single();
+ if(error){setMsg("wMsg","Wallet updated, but transaction log failed: "+errText(error));await loadPlayers();renderPlayers();return}
+ p["Wallet balance"]=next;wallets.unshift(data);renderWallets();renderPlayers();setMsg("wMsg","✅ Wallet updated to ₹"+next);await logActivity("WALLET_ADJUST",{user_id:uid,amount,reason});
+}
+function renderWallets(){
+ $("walletBody").innerHTML=wallets.map(w=>'<tr><td>'+esc(w.id)+'</td><td>'+esc(w.user_id)+'</td><td>₹'+num(w.amount)+'</td><td>'+esc(w.reason)+'</td><td>'+esc(w.created_at)+'</td></tr>').join("")||'<tr><td colspan="5" class="muted">No wallet transactions.</td></tr>';
+}
+
+/* ================= NOTIFICATIONS ================= */
+async function sendNotification(){
+ setMsg("nMsg","Sending...");
+ const raw=$("nUser").value.trim(),uid=raw?num(raw):null,title=$("nTitle").value.trim(),message=$("nMessage").value.trim();
+ if(!title||!message){setMsg("nMsg","Title and message required.");return}
+ const {data,error}=await sb.from("Notifications").insert({user_id:uid,title,message}).select().single();
+ if(error){setMsg("nMsg","❌ "+errText(error));return}
+ notifications.unshift(data);renderNotifications();setMsg("nMsg","✅ Notification sent.");await logActivity("SEND_NOTIFICATION",{user_id:uid,title});
+}
+function renderNotifications(){
+ $("notificationsBody").innerHTML=notifications.map(n=>'<tr><td>'+esc(n.id)+'</td><td>'+esc(n.user_id??"ALL")+'</td><td>'+esc(n.title)+'</td><td>'+esc(n.message)+'</td><td>'+esc(n.created_at)+'</td></tr>').join("")||'<tr><td colspan="5" class="muted">No notifications.</td></tr>';
+}
+
+/* ================= ACTIVITY ================= */
+async function logActivity(action,details={}){
+ try{
+  await sb.from("Admin_Activity_Log").insert({admin_email:currentUser?.email||ADMIN_EMAIL,action:action,details:JSON.stringify(details)});
+ }catch(e){console.warn("Activity log:",e)}
+}
+function renderActivities(){
+ $("activityBody").innerHTML=activities.map(a=>'<tr><td>'+esc(a.id)+'</td><td>'+esc(a.admin_email)+'</td><td>'+esc(a.action)+'</td><td>'+esc(a.details)+'</td><td>'+esc(a.created_at)+'</td></tr>').join("")||'<tr><td colspan="5" class="muted">No activity yet.</td></tr>';
+}
+
+/* ================= EVENTS ================= */
+$("loginButton").addEventListener("click",adminLogin);
+$("logoutButton").addEventListener("click",logout);
+$("refreshButton").addEventListener("click",refreshAll);
+$("createTournamentButton").addEventListener("click",createTournament);
+$("saveResultButton").addEventListener("click",saveResult);
+$("walletButton").addEventListener("click",adjustWallet);
+$("notificationButton").addEventListener("click",sendNotification);
+$("playerSearch").addEventListener("input",renderPlayers);
+$("payFilter").addEventListener("change",renderPayments);
+$("paySearch").addEventListener("input",renderPayments);
+$("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin()});
+
+/* ================= SESSION ================= */
+async function boot(){
+ if(!initSupabase())return;
+ const {data}=await sb.auth.getSession();
+ if(data?.session?.user){
+   if((data.session.user.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase()){
+     currentUser=data.session.user;await openAdmin();
+   }else{
+     await sb.auth.signOut();
+   }
+ }
+ sb.auth.onAuthStateChange((event,session)=>{
+   if(event==="SIGNED_OUT"){
+     currentUser=null;$("app").style.display="none";$("login").style.display="grid";
+   }
+ });
+}
+boot();
+</script>
+</body>
+</html>
