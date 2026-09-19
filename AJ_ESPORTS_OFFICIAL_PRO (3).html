@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AJ ESPORTS OFFICIAL | Free Fire MAX Tournaments</title>
+<meta name="description" content="AJ ESPORTS OFFICIAL - Free Fire MAX tournaments, Solo Duo Squad registration, UPI payment and room details.">
+<style>
+:root{
+ --bg:#070914;--panel:#10152a;--panel2:#151d38;--text:#f5f7ff;--muted:#aeb7d4;
+ --primary:#7c5cff;--secondary:#00e5ff;--pink:#ff3d9a;--green:#35e38a;
+ --danger:#ff5577;--border:rgba(255,255,255,.12);--shadow:0 20px 60px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Arial,sans-serif;background:
+ radial-gradient(circle at 10% 0%,rgba(124,92,255,.24),transparent 32rem),
+ radial-gradient(circle at 90% 10%,rgba(0,229,255,.14),transparent 28rem),var(--bg);
+ color:var(--text);min-height:100vh}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.container{width:min(1180px,92%);margin:auto}
+header{position:sticky;top:0;z-index:20;background:rgba(7,9,20,.84);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.5px}
+.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;
+ background:linear-gradient(135deg,var(--primary),var(--secondary));color:#070914;font-weight:1000;
+ box-shadow:0 0 28px rgba(124,92,255,.45)}
+.brand small{display:block;color:var(--secondary);font-size:10px;letter-spacing:2px}
+.navlinks{display:flex;gap:18px;align-items:center;color:var(--muted);font-size:14px}
+.navlinks a:hover{color:white}
+.btn{border:0;border-radius:13px;padding:13px 18px;font-weight:800;display:inline-flex;justify-content:center;align-items:center;gap:8px;transition:.2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#a34dff);color:white;box-shadow:0 10px 30px rgba(124,92,255,.25)}
+.btn-cyan{background:linear-gradient(135deg,var(--secondary),#4f8cff);color:#06101c}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:white}
+.btn-danger{background:rgba(255,85,119,.15);color:#ff9ab0;border:1px solid rgba(255,85,119,.3)}
+.hero{padding:78px 0 45px;display:grid;grid-template-columns:1.2fr .8fr;gap:35px;align-items:center}
+.kicker{color:var(--secondary);font-weight:900;letter-spacing:3px;font-size:12px;text-transform:uppercase}
+h1{font-size:clamp(38px,6vw,78px);line-height:.98;margin:15px 0 20px}
+.gradient{background:linear-gradient(90deg,#fff,var(--secondary),#b18cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:17px;line-height:1.7;max-width:620px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:25px}
+.hero-card{background:linear-gradient(145deg,rgba(124,92,255,.22),rgba(0,229,255,.08));border:1px solid var(--border);
+border-radius:28px;padding:28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero-card:after{content:"";position:absolute;width:190px;height:190px;border:30px solid rgba(0,229,255,.1);border-radius:50%;right:-75px;top:-75px}
+.hero-card h3{font-size:25px;margin-bottom:10px}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:25px}
+.stat{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:16px;padding:15px}
+.stat b{font-size:25px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.section{padding:35px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:20px}
+.section h2{font-size:30px}.section-head p{color:var(--muted);font-size:14px}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.field,.select{width:100%;background:#0b1021;color:white;border:1px solid var(--border);border-radius:12px;padding:13px;outline:none}
+.field:focus,.select:focus{border-color:var(--secondary)}
+.filters .field{max-width:300px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:linear-gradient(160deg,rgba(21,29,56,.95),rgba(11,16,33,.95));border:1px solid var(--border);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
+.card-top{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.card h3{font-size:20px;margin:12px 0}
+.badge{font-size:11px;padding:6px 9px;border-radius:99px;font-weight:900;background:rgba(53,227,138,.13);color:var(--green);white-space:nowrap}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.meta div{background:rgba(255,255,255,.05);border-radius:12px;padding:11px}
+.meta small{display:block;color:var(--muted);font-size:11px}.meta b{font-size:16px}
+.card .btn{width:100%}
+.empty{padding:35px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:18px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.step{padding:20px;border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,.035)}
+.step b{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--primary);margin-bottom:14px}
+.step p{color:var(--muted);font-size:13px;line-height:1.6}
+footer{border-top:1px solid var(--border);padding:28px 0;color:var(--muted);font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal.show{display:flex}
+.modal-box{width:min(650px,100%);max-height:92vh;overflow:auto;background:#0e1428;border:1px solid var(--border);border-radius:24px;padding:25px;box-shadow:var(--shadow)}
+.modal-head{display:flex;justify-content:space-between;gap:15px;margin-bottom:20px}
+.close{background:rgba(255,255,255,.08);border:0;color:white;border-radius:10px;width:35px;height:35px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.full{grid-column:1/-1}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+.qr{display:grid;place-items:center;min-height:180px;border:1px dashed var(--secondary);border-radius:18px;background:rgba(0,229,255,.04);margin:12px 0;text-align:center;padding:20px}
+.qr img{max-width:180px;width:100%;border-radius:12px}
+.notice{padding:13px;border-radius:12px;background:rgba(255,193,7,.1);border:1px solid rgba(255,193,7,.25);color:#ffe49a;font-size:12px;line-height:1.5}
+.player{border:1px solid var(--border);border-radius:15px;padding:14px;margin-top:12px}
+.player h4{margin-bottom:10px;color:var(--secondary)}
+.entries{display:grid;gap:12px}.entry{padding:17px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.04)}
+.entry .room{margin-top:12px;padding:12px;border-radius:12px;background:rgba(53,227,138,.09);border:1px solid rgba(53,227,138,.25)}
+.hidden{display:none!important}
+@media(max-width:850px){.hero{grid-template-columns:1fr;padding-top:45px}.cards{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.navlinks{gap:9px}.navlinks a{display:none}}
+@media(max-width:560px){.cards,.formgrid{grid-template-columns:1fr}.statgrid{gap:7px}.stat{padding:11px}.stat b{font-size:21px}.hero-card{padding:20px}.section h2{font-size:25px}}
+</style>
+</head>
+<body>
+<header><div class="container nav">
+<a class="brand" href="#"><div class="logo">AJ</div><div>AJ ESPORTS OFFICIAL<small>FREE FIRE MAX TOURNAMENTS</small></div></a>
+<nav class="navlinks"><a href="#tournaments">Tournaments</a><a href="#how">How to Join</a><a href="#entries">My Entries</a><button class="btn btn-ghost" id="loginBtn">Login</button></nav>
+</div></header>
+
+<main>
+<section class="container hero">
+<div><div class="kicker">India's Gaming Arena</div><h1>Compete. <span class="gradient">Play.</span><br>Win Big.</h1>
+<p>AJ ESPORTS OFFICIAL पर Free Fire MAX के Solo, Duo और Squad tournaments में join करें। Entry pay करें, match खेलें और room details अपने dashboard में देखें।</p>
+<div class="actions"><a class="btn btn-primary" href="#tournaments">Explore Tournaments →</a><a class="btn btn-ghost" href="#how">How it works</a></div>
+<div class="statgrid"><div class="stat"><b>3+</b><span>Game Modes</span></div><div class="stat"><b>48</b><span>Player Slots</span></div><div class="stat"><b>24/7</b><span>Updates</span></div></div></div>
+<div class="hero-card"><div class="kicker">AJ ARENA</div><h3>Next Level Gaming Experience</h3><p>Fast registration • Secure UPI details • Room ID updates • Tournament announcements</p><div class="actions"><button class="btn btn-cyan" onclick="scrollToSection('tournaments')">Join a Match</button></div></div>
+</section>
+
+<section class="container section" id="tournaments"><div class="section-head"><div><h2>Live Tournaments</h2><p>अपना match चुनें और registration शुरू करें।</p></div><button class="btn btn-ghost" onclick="loadMatches()">↻ Refresh</button></div>
+<div class="filters"><input class="field" id="search" placeholder="Search tournament..." oninput="renderMatches()"><select class="select" id="modeFilter" onchange="renderMatches()" style="max-width:180px"><option value="">All Modes</option><option>Solo</option><option>Duo</option><option>Squad</option></select></div>
+<div class="cards" id="matchCards"><div class="empty">Matches loading...</div></div></section>
+
+<section class="container section" id="how"><div class="section-head"><div><h2>How to Join</h2><p>चार आसान steps में tournament join करें।</p></div></div>
+<div class="steps"><div class="step"><b>1</b><h3>Choose Match</h3><p>अपना Solo, Duo या Squad match select करें।</p></div><div class="step"><b>2</b><h3>Fill Details</h3><p>Player names, Free Fire UID और phone number भरें।</p></div><div class="step"><b>3</b><h3>Pay Entry</h3><p>UPI/QR से payment करके UTR और screenshot submit करें।</p></div><div class="step"><b>4</b><h3>Play & Win</h3><p>My Entries में status और room details check करें।</p></div></div></section>
+
+<section class="container section" id="entries"><div class="section-head"><div><h2>My Entries</h2><p>अपने registrations और room details देखें।</p></div><button class="btn btn-ghost" onclick="loadEntries()">↻ Refresh</button></div><div id="entriesList" class="entries"><div class="empty">Login करके अपनी entries देखें।</div></div></section>
+</main>
+
+<footer><div class="container" style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap"><span>© 2026 AJ ESPORTS OFFICIAL. All rights reserved.</span><span>Support: <a href="https://wa.me/" target="_blank" style="color:var(--secondary)">WhatsApp Updates</a></span></div></footer>
+
+<div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><div><div class="kicker">REGISTRATION</div><h2 id="modalTitle">Join Tournament</h2></div><button class="close" onclick="closeModal()">✕</button></div>
+<form id="registrationForm"><input type="hidden" id="matchId"><input type="hidden" id="matchAmount">
+<div class="formgrid"><div><label>Tournament</label><input class="field" id="matchName" readonly></div><div><label>Game Mode</label><input class="field" id="matchMode" readonly></div><div><label>Captain Phone</label><input class="field" id="phone" required pattern="[0-9]{10}" placeholder="10 digit mobile"></div><div><label>Team Name</label><input class="field" id="teamName" placeholder="Solo में optional"></div></div>
+<div id="players"></div>
+<div class="qr"><div><b>Payment UPI ID</b><p style="color:var(--secondary);font-size:18px;margin:7px 0">ajesportsofficial@ibl</p><p style="font-size:12px;color:var(--muted)">QR image यहाँ add करें या Pay Now button से UPI app खोलें।</p><button type="button" class="btn btn-cyan" onclick="payNow()">Pay Now ₹<span id="payAmount">0</span></button></div></div>
+<div class="formgrid"><div><label>UTR / Transaction ID</label><input class="field" id="utr" required placeholder="Payment reference number"></div><div><label>Payment Screenshot</label><input class="field" id="proof" type="file" accept="image/*"></div></div>
+<div class="notice" style="margin:15px 0">Payment करने के बाद सही UTR भरें। Fake या duplicate payment details देने पर registration cancel हो सकता है।</div>
+<button class="btn btn-primary" style="width:100%" type="submit">Submit Registration →</button><p id="formMsg" style="margin-top:12px;color:var(--secondary);font-size:13px"></p>
+</form></div></div>
+
+<div class="modal" id="authModal"><div class="modal-box"><div class="modal-head"><div><div class="kicker">ACCOUNT</div><h2>Login / Signup</h2></div><button class="close" onclick="closeAuth()">✕</button></div>
+<form id="authForm"><div class="formgrid"><div class="full"><label>Email</label><input class="field" id="email" type="email" required></div><div class="full"><label>Password</label><input class="field" id="password" type="password" required minlength="6"></div></div><button class="btn btn-primary" style="width:100%;margin-top:15px">Continue</button><p id="authMsg" style="margin-top:12px;color:var(--secondary);font-size:13px"></p></form></div></div>
+
+<script>
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const UPI_ID = "ajesportsofficial@ibl";
+let matches=[], currentUser=null;
+
+const $=id=>document.getElementById(id);
+function show(id){$(id).classList.add("show")} function hide(id){$(id).classList.remove("show")}
+function closeModal(){hide("modal")} function closeAuth(){hide("authModal")}
+function scrollToSection(id){document.getElementById(id).scrollIntoView({behavior:"smooth"})}
+function headers(){return {"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"application/json"}}
+async function api(table,params="",options={}){if(SUPABASE_URL.startsWith("YOUR_"))return null;const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}${params}`,{headers:headers(),...options});if(!r.ok)throw new Error(await r.text());return r.status===204?null:r.json()}
+
+async function loadMatches(){
+ try{
+  const data=await api("Matches","?select=*&order=id.desc");
+  matches=data||[
+   {id:"demo-solo",title:"Daily Solo Clash",mode:"Solo",entry_fee:20,prize_pool:800,per_kill:10,status:"Upcoming",slots:48},
+   {id:"demo-duo",title:"Duo Battle Arena",mode:"Duo",entry_fee:50,prize_pool:2000,per_kill:20,status:"Upcoming",slots:48},
+   {id:"demo-squad",title:"Squad Championship",mode:"Squad",entry_fee:100,prize_pool:5000,per_kill:30,status:"Upcoming",slots:48}
+  ];
+  renderMatches();
+ }catch(e){matches=[];$("matchCards").innerHTML='<div class="empty">Matches load नहीं हो पाए। Supabase configuration check करें।</div>'}
+}
+function val(o,...keys){for(const k of keys)if(o&&o[k]!==undefined)return o[k];return ""}
+function renderMatches(){
+ const q=$("search").value.toLowerCase(),mode=$("modeFilter").value;
+ const list=matches.filter(m=>(val(m,"title","name")||"").toLowerCase().includes(q)&&(!mode||val(m,"mode","game_mode")===mode));
+ $("matchCards").innerHTML=list.length?list.map(m=>`<article class="card"><div class="card-top"><span class="badge">${val(m,"status")||"Upcoming"}</span><span style="color:var(--secondary);font-size:12px">${val(m,"mode","game_mode")||"Open"}</span></div><h3>${val(m,"title","name")||"Tournament"}</h3><div class="meta"><div><small>Prize Pool</small><b>₹${val(m,"prize_pool","prize")||0}</b></div><div><small>Entry Fee</small><b>₹${val(m,"entry_fee","amount")||0}</b></div><div><small>Per Kill</small><b>₹${val(m,"per_kill","kill_reward")||0}</b></div><div><small>Slots</small><b>${val(m,"slots","max_players")||48}</b></div></div><button class="btn btn-primary" onclick="openRegistration('${m.id}')">Join Match →</button></article>`).join(""):'<div class="empty">इस filter में कोई tournament नहीं मिला।</div>';
+}
+function openRegistration(id){
+ const m=matches.find(x=>String(x.id)===String(id));if(!m)return;
+ $("matchId").value=m.id;$("matchAmount").value=val(m,"entry_fee","amount")||0;
+ $("matchName").value=val(m,"title","name");$("matchMode").value=val(m,"mode","game_mode")||"Solo";
+ $("payAmount").textContent=$("matchAmount").value;
+ const count=($("matchMode").value==="Solo"?1:$("matchMode").value==="Duo"?2:4);
+ $("players").innerHTML=Array.from({length:count},(_,i)=>`<div class="player"><h4>Player ${i+1}${i===0?" (Captain)":""}</h4><div class="formgrid"><div><label>Player Name</label><input class="field" name="player${i+1}_name" required></div><div><label>Free Fire UID</label><input class="field" name="player${i+1}_uid" required inputmode="numeric"></div></div></div>`).join("");
+ $("teamName").required=count>1;show("modal");
+}
+function payNow(){location.href=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=AJ%20ESPORTS%20OFFICIAL&am=${encodeURIComponent($("matchAmount").value)}&cu=INR`}
+$("registrationForm").addEventListener("submit",async e=>{
+ e.preventDefault();$("formMsg").textContent="Submitting...";
+ const fd=new FormData(e.target),payload={match_id:$("matchId").value,user_id:currentUser?.id||null,mode:$("matchMode").value,team_name:$("teamName").value,phone:$("phone").value,amount:Number($("matchAmount").value),payment_id:$("utr").value,status:"Pending"};
+ for(let i=1;i<=4;i++){payload["player"+i+"_name"]=fd.get("player"+i+"_name")||null;payload["player"+i+"_uid"]=fd.get("player"+i+"_uid")||null}
+ try{
+  if(SUPABASE_URL.startsWith("YOUR_")){localStorage.setItem("aj_demo_entry",JSON.stringify(payload));$("formMsg").textContent="Demo registration saved. Supabase connect करने पर live save होगा.";return}
+  await api("Tournament_Registrations","",{method:"POST",headers:{...headers(),"Prefer":"return=minimal"},body:JSON.stringify(payload)});
+  $("formMsg").textContent="Registration submitted successfully!";
+ }catch(err){$("formMsg").textContent="Submit failed: "+err.message}
+});
+$("loginBtn").onclick=()=>show("authModal");
+$("authForm").addEventListener("submit",async e=>{
+ e.preventDefault();$("authMsg").textContent="Please connect Supabase Auth for live login.";
+});
+async function loadEntries(){
+ if(!currentUser){$("entriesList").innerHTML='<div class="empty">पहले Login करें।</div>';return}
+ try{
+  const data=await api("Tournament_Registrations",`?user_id=eq.${encodeURIComponent(currentUser.id)}&select=*`);
+  $("entriesList").innerHTML=(data||[]).map(x=>`<div class="entry"><b>${x.team_name||"Registration"}</b><p style="color:var(--muted);font-size:13px">Mode: ${x.mode||"-"} • Status: ${x.status||"Pending"}</p>${x.room_id?`<div class="room">Room ID: <b>${x.room_id}</b><br>Password: <b>${x.room_password||"-"}</b></div>`:'<p style="color:var(--muted);font-size:12px;margin-top:8px">Room details match publish होने के बाद दिखेंगे।</p>'}</div>`).join("")||'<div class="empty">No entries found.</div>';
+ }catch(e){$("entriesList").innerHTML='<div class="empty">Entries load नहीं हो पाईं।</div>'}
+}
+loadMatches();
+</script>
+</body>
+</html>
